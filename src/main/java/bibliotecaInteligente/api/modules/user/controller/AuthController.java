@@ -17,10 +17,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
+@Tag(
+        name = "Autenticação",
+        description = "Endpoints responsáveis pelo cadastro, login e logout de usuários"
+)
 @RestController
 @RequestMapping("/api/user")
-public class UserController {
+public class AuthController {
 
     @Autowired
     private UserService userService;
@@ -28,12 +36,32 @@ public class UserController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    @Operation(
+            summary = "Cadastrar usuário",
+            description = "Realiza o cadastro de um novo usuário no sistema"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Usuário cadastrado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos")
+    })
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody @Valid UserDto dto){
         userService.registerUser(dto);
         return ResponseEntity.ok("Usuario cadastrado com sucesso!");
     }
 
+    @Operation(
+            summary = "Autenticar usuário",
+            description = """
+        Realiza a autenticação do usuário utilizando email e senha.
+        Em caso de sucesso, uma sessão é criada e armazenada no Redis.
+        O cookie de sessão deve ser enviado nas próximas requisições.
+        """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Login realizado com sucesso"),
+            @ApiResponse(responseCode = "401", description = "Credenciais inválidas")
+    })
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody @Valid UserDto dto, HttpServletRequest request){
         try{
@@ -44,9 +72,6 @@ public class UserController {
             SecurityContext context = SecurityContextHolder.getContext();
             context.setAuthentication(authentication);
 
-            HttpSession session = request.getSession(true);
-            session.setAttribute("SPRING_SECURITY_CONTEXT", context);
-
             return ResponseEntity.ok("login realizado com sucesso! Cookie de sessao gerado.");
 
         } catch (AuthenticationException e) {
@@ -54,6 +79,13 @@ public class UserController {
         }
     }
 
+    @Operation(
+            summary = "Encerrar sessão",
+            description = "Invalida a sessão atual do usuário"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Logout realizado com sucesso")
+    })
     @PostMapping("logout")
     public ResponseEntity<String> logout(HttpServletRequest request){
         HttpSession session = request.getSession(false);
