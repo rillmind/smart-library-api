@@ -1,8 +1,9 @@
-# Smart Library — Frontend
+# Smart Library — Monorepo
 
-Este repositório concentra a implementação do frontend da aplicação Smart Library.
+Organizei o projeto no formato de monorepo para centralizar os códigos das equipes de frontend e backend em um único repositório.
 
-O desenvolvimento do sistema segue uma arquitetura cliente-servidor, na qual o frontend foi construído utilizando **Angular 21** e o backend é implementado de forma independente em **Java / Spring Boot**.
+> [!IMPORTANT]
+> O meu trabalho de desenvolvimento e as minhas alterações de código são feitos **exclusivamente na pasta `frontend/`**. A pasta `backend/` é de responsabilidade dos meninos do backend (João e Geferson) e do Raul (Tech Lead), portanto eu não realizo modificações no código da API Spring Boot.
 
 ---
 
@@ -19,29 +20,24 @@ O desenvolvimento do sistema segue uma arquitetura cliente-servidor, na qual o f
 
 ## 📂 Estrutura de Pastas
 
-O projeto está estruturado de acordo com o padrão modular recomendado para o Angular moderno:
+Estruturei o monorepo dividindo os escopos de frontend e backend da seguinte forma:
 
 ```text
-src/
-├── app/
-│   ├── core/                  # Recursos globais e comuns da aplicação
-│   │   ├── layout/            # Estrutura de layout (Header, Sidebar, MainLayout)
-│   │   └── models/            # Interfaces que representam as entidades (Livro, Usuário, Empréstimo)
-│   ├── features/              # Funcionalidades e telas com carregamento via Lazy Loading
-│   │   ├── auth/              # Estrutura para autenticação e login
-│   │   ├── books/             # Visualização, cadastro e edição de livros
-│   │   ├── dashboard/         # Dashboard estatístico e logs de auditoria
-│   │   ├── loans/             # Listagem e controle de empréstimos
-│   │   └── users/             # Gerenciamento de perfis e usuários
-│   ├── shared/                # Recursos compartilhados
-│   │   └── services/          # MockDataService para simulação local de APIs
-│   ├── app.component.ts       # Componente raiz da aplicação
-│   ├── app.config.ts          # Configurações globais do sistema
-│   └── app.routes.ts          # Configuração das rotas da aplicação
-├── assets/                    # Arquivos estáticos da aplicação
-├── index.html                 # Index HTML principal da aplicação
-├── main.ts                    # Arquivo de inicialização do Angular
-└── styles.scss                # Variáveis de estilo, resets e estilização de diálogos globais
+Biblioteca/ (raiz)
+├── backend/                   # API Java / Spring Boot (equipe separada)
+├── frontend/                  # Aplicação Angular 21 (meu escopo)
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── core/          # Recursos globais e comuns da aplicação (layouts, models, guards)
+│   │   │   ├── features/      # Módulos com lazy loading (dashboard, auth, books, loans, users)
+│   │   │   ├── shared/        # Recursos compartilhados (MockDataService)
+│   │   │   ├── app.component.ts
+│   │   │   ├── app.config.ts
+│   │   │   └── app.routes.ts
+│   │   ├── assets/            # Arquivos estáticos
+│   │   ├── index.html
+│   │   ├── main.ts
+│   │   └── styles.scss
 ```
 
 ---
@@ -67,22 +63,22 @@ Lista de funcionalidades mapeadas e o status atual da implementação no fronten
 
 ## ⚙️ Como rodar o projeto localmente
 
-Para executar e testar a aplicação localmente:
+Para rodar e testar a nossa aplicação localmente:
 
-1. Clonar o repositório da branch principal.
-2. Acessar a pasta do projeto:
+1. Clonar o repositório principal.
+2. Acessar a pasta do frontend:
    ```bash
-   cd smart-library-web
+   cd frontend
    ```
-3. Instalar as dependências:
+3. Instalar as dependências necessárias do Angular:
    ```bash
    npm install
    ```
-4. Executar o servidor de desenvolvimento:
+4. Subir o servidor de desenvolvimento:
    ```bash
    npm start
    ```
-5. Acessar `http://localhost:4200/` no navegador. O servidor dispõe de live-reload e é atualizado automaticamente a cada alteração salva.
+5. Acessar `http://localhost:4200/` no seu navegador. O servidor local roda com live-reload, atualizando tudo na hora em que salvamos os arquivos.
 
 ---
 

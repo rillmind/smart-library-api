@@ -2,6 +2,19 @@
 
 Registro de todas as alterações realizadas no projeto para controle interno e acompanhamento da equipe.
 
+## [2026-06-22] — Reestruturação Monorepo e Definição de Escopo de Desenvolvimento
+
+### Adicionado
+- **Regras do Projeto e Escopo:**
+  - Adicionei a seção mandatória de restrição de escopo nos arquivos `GEMINI.md` e `.agents/AGENTS.md`, deixando claro que o meu trabalho de desenvolvimento é feito exclusivamente na pasta do frontend (`frontend/`), sendo terminantemente proibido realizar modificações na pasta do backend (`backend/`).
+- **Organização do Monorepo:**
+  - Reestruturei a organização do repositório movendo a aplicação Angular para o diretório `frontend/` e o projeto de API Spring Boot para o diretório `backend/`.
+  - Ajustei o arquivo `.gitignore` global para ignorar de forma correta as pastas `node_modules/` e `.angular/cache/` localizadas no subdiretório do frontend, além do diretório de build `target/` e arquivos de IDE no backend Java.
+
+### Alterado
+- **Documentação de Execução:**
+  - Ajustei o `README.md` principal detalhando a nova hierarquia de pastas do monorepo e atualizando os passos de instalação e execução local para que o desenvolvedor entre no diretório `frontend/` primeiro.
+
 ## [2026-06-10] — Painel de Administração, Sistema de Permissões e Controle de Acesso
 
 ### Adicionado
