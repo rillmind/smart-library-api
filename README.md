@@ -1,9 +1,6 @@
 # Smart Library — Monorepo
 
-Organizei o projeto no formato de monorepo para centralizar os códigos das equipes de frontend e backend em um único repositório.
-
-> [!IMPORTANT]
-> O meu trabalho de desenvolvimento e as minhas alterações de código são feitos **exclusivamente na pasta `frontend/`**. A pasta `backend/` é de responsabilidade dos meninos do backend (João e Geferson) e do Raul (Tech Lead), portanto eu não realizo modificações no código da API Spring Boot.
+Organizei o projeto no formato de monorepo para centralizar os códigos das equipes de frontend e backend em um único repositório, facilitando a organização das pastas.
 
 ---
 
