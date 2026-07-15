@@ -15,6 +15,8 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { LoanService } from '../../../../core/services/loan.service';
 import { TranslationService } from '../../../../core/services/translation.service';
 import { SearchService } from '../../../../core/services/search.service';
+import { WaitlistService } from '../../../../core/services/waitlist.service';
+import { WaitlistEntry } from '../../../../core/models/waitlist.model';
 
 @Component({
   selector: 'app-book-list',
@@ -36,6 +38,7 @@ import { SearchService } from '../../../../core/services/search.service';
 export class BookListComponent implements OnInit {
   private bookService = inject(BookService);
   private loanService = inject(LoanService);
+  private waitlistService = inject(WaitlistService);
   private snackBar = inject(MatSnackBar);
   authService = inject(AuthService);
   translationService = inject(TranslationService);
@@ -43,6 +46,7 @@ export class BookListComponent implements OnInit {
 
   bookDrawer = viewChild<BookFormDrawerComponent>('bookDrawer');
   allBooks = signal<Book[]>([]);
+  myWaitlist = signal<WaitlistEntry[]>([]);
   categoryLabels = BOOK_CATEGORY_LABELS;
 
   filteredBooks = computed(() => {
@@ -59,12 +63,22 @@ export class BookListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadBooks();
+    this.loadMyWaitlist();
   }
 
   loadBooks(): void {
     this.bookService.getBooks().subscribe((books) => {
       this.allBooks.set([...books]);
     });
+  }
+
+  loadMyWaitlist(): void {
+    const user = this.authService.currentUser();
+    if (user && !this.authService.isAdmin()) {
+      this.waitlistService.getMyWaitlist(user.id).subscribe((entries) => {
+        this.myWaitlist.set(entries);
+      });
+    }
   }
 
   openDrawer(book?: Book): void {
@@ -129,5 +143,44 @@ export class BookListComponent implements OnInit {
         this.loadBooks();
       });
     }
+  }
+
+  getWaitlistEntry(bookId: string): WaitlistEntry | undefined {
+    return this.myWaitlist().find(w => w.bookId === bookId && w.status === 'AGUARDANDO');
+  }
+
+  joinWaitlist(book: Book): void {
+    const user = this.authService.currentUser();
+    if (user) {
+      this.waitlistService.joinWaitlist(String(book.id), user.id).subscribe({
+        next: () => {
+          this.snackBar.open('Entrou na fila de espera com sucesso!', 'Fechar', {
+            duration: 4000,
+            horizontalPosition: 'end',
+            verticalPosition: 'top',
+          });
+          this.loadMyWaitlist();
+        },
+        error: (err) => {
+          const msg = err?.error?.message || 'Erro ao entrar na fila de espera.';
+          this.snackBar.open(msg, 'Fechar', {
+            duration: 4000,
+            horizontalPosition: 'end',
+            verticalPosition: 'top',
+          });
+        }
+      });
+    }
+  }
+
+  leaveWaitlist(entry: WaitlistEntry): void {
+    this.waitlistService.leaveWaitlist(entry.id).subscribe(() => {
+      this.snackBar.open('Saiu da fila de espera com sucesso!', 'Fechar', {
+        duration: 4000,
+        horizontalPosition: 'end',
+        verticalPosition: 'top',
+      });
+      this.loadMyWaitlist();
+    });
   }
 }

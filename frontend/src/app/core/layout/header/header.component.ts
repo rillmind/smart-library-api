@@ -1,4 +1,4 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, computed, OnInit } from '@angular/core';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -11,6 +11,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { TranslationService } from '../../../core/services/translation.service';
 import { SearchService } from '../../../core/services/search.service';
 import { SidebarService } from '../../../core/services/sidebar.service';
+import { NotificationService } from '../../../core/services/notification.service';
 
 @Component({
   selector: 'app-header',
@@ -28,12 +29,20 @@ import { SidebarService } from '../../../core/services/sidebar.service';
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit {
   authService = inject(AuthService);
   translationService = inject(TranslationService);
   searchService = inject(SearchService);
   sidebarService = inject(SidebarService);
+  notificationService = inject(NotificationService);
   private router = inject(Router);
+
+  ngOnInit(): void {
+    const userId = this.authService.currentUser()?.id;
+    if (userId) {
+      this.notificationService.getUnreadCount(userId).subscribe();
+    }
+  }
 
   userInitials = computed(() => {
     const name = this.authService.currentUser()?.name;

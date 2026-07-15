@@ -6,6 +6,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { AuthService } from '../../../core/services/auth.service';
 import { TranslationService } from '../../../core/services/translation.service';
 import { SidebarService } from '../../../core/services/sidebar.service';
+import { NotificationService } from '../../../core/services/notification.service';
 
 interface NavItem {
   icon: string;
@@ -25,6 +26,7 @@ export class SidebarComponent {
   authService = inject(AuthService);
   translationService = inject(TranslationService);
   sidebarService = inject(SidebarService);
+  notificationService = inject(NotificationService);
 
   navItems = computed<NavItem[]>(() => {
     if (this.authService.isAdmin()) {
@@ -45,6 +47,7 @@ export class SidebarComponent {
 
   secondaryNavItems = computed<NavItem[]>(() => {
     return [
+      { icon: 'notifications', label: this.translationService.translate('notifications'), route: '/notifications', exact: true },
       { icon: 'person', label: this.translationService.translate('profile'), route: '/users/profile', exact: true },
       { icon: 'settings', label: this.translationService.translate('settings'), route: '/settings', exact: true },
     ];

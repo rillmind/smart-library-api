@@ -3,6 +3,8 @@ import { User } from '../../core/models/user.model';
 import { Book } from '../../core/models/book.model';
 import { Loan } from '../../core/models/loan.model';
 import { Library } from '../../core/models/library.model';
+import { WaitlistEntry } from '../../core/models/waitlist.model';
+import { AppNotification } from '../../core/models/notification.model';
 
 @Injectable({
   providedIn: 'root',
@@ -201,6 +203,59 @@ export class MockDataService {
     },
   ];
 
+  private waitlistEntries: WaitlistEntry[] = [
+    {
+      id: '1',
+      userId: '1',
+      userName: 'Gustavo de Lima',
+      bookId: '2',
+      bookTitle: 'Design Patterns: Elements of Reusable Object-Oriented Software',
+      position: 1,
+      entryDate: new Date('2026-07-01'),
+      status: 'AGUARDANDO',
+    },
+    {
+      id: '2',
+      userId: '3',
+      userName: 'Carlos Santos',
+      bookId: '2',
+      bookTitle: 'Design Patterns: Elements of Reusable Object-Oriented Software',
+      position: 2,
+      entryDate: new Date('2026-07-03'),
+      status: 'AGUARDANDO',
+    },
+  ];
+
+  private notifications: AppNotification[] = [
+    {
+      id: '1',
+      userId: '1',
+      title: 'Empréstimo vencendo!',
+      message: 'O livro "Engenharia de Software" vence em 2 dias. Renove ou devolva para evitar multas.',
+      type: 'EMPRESTIMO_VENCENDO',
+      read: false,
+      createdAt: new Date(Date.now() - 86400000),
+    },
+    {
+      id: '2',
+      userId: '1',
+      title: 'Livro disponível!',
+      message: 'O livro "Design Patterns" está disponível para empréstimo. Você era o próximo da fila.',
+      type: 'LIVRO_DISPONIVEL',
+      read: false,
+      createdAt: new Date(Date.now() - 3600000),
+    },
+    {
+      id: '3',
+      userId: '2',
+      title: 'Empréstimo atrasado!',
+      message: 'O livro "Design Patterns" está com a devolução atrasada. Devolva o quanto antes.',
+      type: 'EMPRESTIMO_ATRASADO',
+      read: true,
+      createdAt: new Date(Date.now() - 172800000),
+    },
+  ];
+
   getLibraries(): Library[] {
     return this.libraries;
   }
@@ -358,5 +413,59 @@ export class MockDataService {
       overdueLoans: userLoans.filter((l) => l.status === 'OVERDUE').length,
       returnedLoans: userLoans.filter((l) => l.status === 'RETURNED').length,
     };
+  }
+
+  getWaitlistByBook(bookId: string): WaitlistEntry[] {
+    return this.waitlistEntries.filter(w => w.bookId === bookId && w.status === 'AGUARDANDO');
+  }
+
+  getWaitlistByUser(userId: string): WaitlistEntry[] {
+    return this.waitlistEntries.filter(w => w.userId === userId);
+  }
+
+  joinWaitlist(bookId: string, userId: string): WaitlistEntry {
+    const user = this.users.find(u => u.id === userId);
+    const book = this.books.find(b => b.id === bookId);
+    const currentQueue = this.getWaitlistByBook(bookId);
+    const entry: WaitlistEntry = {
+      id: String(this.waitlistEntries.length + 1),
+      userId,
+      userName: user?.name || '',
+      bookId,
+      bookTitle: book?.title || '',
+      position: currentQueue.length + 1,
+      entryDate: new Date(),
+      status: 'AGUARDANDO',
+    };
+    this.waitlistEntries.push(entry);
+    this.addLog(`"${entry.userName}" entrou na fila de espera do livro "${entry.bookTitle}".`);
+    return entry;
+  }
+
+  leaveWaitlist(id: string): void {
+    const entry = this.waitlistEntries.find(w => w.id === id);
+    if (entry) {
+      entry.status = 'CANCELADO';
+      this.addLog(`"${entry.userName}" saiu da fila de espera do livro "${entry.bookTitle}".`);
+    }
+  }
+
+  isUserInWaitlist(bookId: string, userId: string): WaitlistEntry | undefined {
+    return this.waitlistEntries.find(w => w.bookId === bookId && w.userId === userId && w.status === 'AGUARDANDO');
+  }
+
+  getNotifications(userId: string): AppNotification[] {
+    return this.notifications.filter(n => n.userId === userId).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  markNotificationAsRead(id: string): void {
+    const notif = this.notifications.find(n => n.id === id);
+    if (notif) {
+      notif.read = true;
+    }
+  }
+
+  markAllNotificationsAsRead(userId: string): void {
+    this.notifications.filter(n => n.userId === userId).forEach(n => n.read = true);
   }
 }

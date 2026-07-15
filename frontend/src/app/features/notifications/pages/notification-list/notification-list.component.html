@@ -1,0 +1,38 @@
+<div class="notifications animate-fade-in">
+  <div class="notifications__header">
+    <h1 class="page-title">{{ translationService.translate('notifications_center') }}</h1>
+    <button mat-flat-button color="primary" (click)="markAllAsRead()" [disabled]="unreadCount() === 0">
+      <mat-icon>done_all</mat-icon>
+      Marcar todas como lidas
+    </button>
+  </div>
+
+  @if (loading()) {
+    <p>Carregando...</p>
+  } @else if (notifications().length === 0) {
+    <mat-card class="notifications__empty">
+      <mat-icon>notifications_off</mat-icon>
+      <p>{{ translationService.translate('no_notifications') }}</p>
+    </mat-card>
+  } @else {
+    @for (notification of notifications(); track notification.id) {
+      <mat-card class="notification-card" [class.notification-card--unread]="!notification.read">
+        <div class="notification-card__icon" [ngClass]="getIconClass(notification.type)">
+          <mat-icon>{{ getIcon(notification.type) }}</mat-icon>
+        </div>
+        <div class="notification-card__content">
+          <span class="notification-card__title">{{ notification.title }}</span>
+          <span class="notification-card__message">{{ notification.message }}</span>
+          <span class="notification-card__date">{{ notification.createdAt | date:'dd/MM/yyyy' }}</span>
+        </div>
+        @if (!notification.read) {
+          <div class="notification-card__actions">
+            <button mat-icon-button (click)="markAsRead(notification.id)" aria-label="Marcar como lida">
+              <mat-icon>done</mat-icon>
+            </button>
+          </div>
+        }
+      </mat-card>
+    }
+  }
+</div>

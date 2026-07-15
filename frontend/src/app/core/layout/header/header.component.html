@@ -23,7 +23,15 @@
   </div>
 
   <div class="header__right">
-    <button mat-icon-button aria-label="Notificações" [matBadge]="3" matBadgeColor="warn" matBadgeSize="small">
+    <button
+      mat-icon-button
+      aria-label="Notificações"
+      routerLink="/notifications"
+      [matBadge]="notificationService.unreadCount()"
+      matBadgeColor="warn"
+      matBadgeSize="small"
+      [matBadgeHidden]="notificationService.unreadCount() === 0"
+    >
       <mat-icon>notifications_none</mat-icon>
     </button>
 

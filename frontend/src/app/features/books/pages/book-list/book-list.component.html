@@ -59,16 +59,40 @@
                 </button>
               </div>
             } @else {
-              <button
-                mat-flat-button
-                color="primary"
-                [disabled]="book.availableCopies === 0"
-                (click)="requestLoan(book)"
-                type="button"
-                style="height: 36px; padding: 0 16px; min-width: 90px; line-height: 36px;"
-              >
-                {{ translationService.translate('request') }}
-              </button>
+              @if (book.availableCopies > 0) {
+                <button
+                  mat-flat-button
+                  color="primary"
+                  (click)="requestLoan(book)"
+                  type="button"
+                  style="height: 36px; padding: 0 16px; min-width: 90px; line-height: 36px;"
+                >
+                  {{ translationService.translate('request') }}
+                </button>
+              } @else {
+                @let waitlistEntry = getWaitlistEntry(book.id);
+                @if (waitlistEntry) {
+                  <button
+                    mat-flat-button
+                    color="warn"
+                    (click)="leaveWaitlist(waitlistEntry)"
+                    type="button"
+                    style="height: 36px; padding: 0 16px; min-width: 90px; line-height: 36px;"
+                  >
+                    Sair da Fila
+                  </button>
+                } @else {
+                  <button
+                    mat-flat-button
+                    color="accent"
+                    (click)="joinWaitlist(book)"
+                    type="button"
+                    style="height: 36px; padding: 0 16px; min-width: 90px; line-height: 36px;"
+                  >
+                    Entrar na Fila
+                  </button>
+                }
+              }
             }
           </div>
         </div>

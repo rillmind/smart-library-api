@@ -2,6 +2,34 @@
 
 Registro de todas as alterações realizadas no projeto para controle interno e acompanhamento da equipe.
 
+## [2026-07-15] — Fila de Espera de Livros e Centro de Notificações In-App
+
+### Adicionado
+- **Módulo de Fila de Espera no Backend (RF05):**
+  - Criei a entidade JPA `FilaEspera.java` (`tb_fila_espera`), repositório `FilaEsperaRepository.java`, serviço `FilaEsperaService.java` e controlador REST `FilaEsperaController.java` exposto no endpoint `/fila-espera`.
+  - Desenvolvi a lógica de entrada e saída da fila, cálculo de posições reativas e acionamento automático de notificações.
+- **Integração de Fila de Espera com Devoluções no Backend:**
+  - Acoplei o serviço `FilaEsperaService.notificarProximo` ao fluxo do método `devolverEmprestimo` em `EmprestimoService.java`. Quando um exemplar é devolvido, a API notifica e altera o status do leitor que estava no topo da fila do livro para `NOTIFICADO`.
+- **Módulo de Notificações no Backend (RF06):**
+  - Criei a entidade JPA `Notificacao.java` (`tb_notificacao`), repositório `NotificacaoRepository.java`, serviço `NotificacaoService.java` e controlador REST `NotificacaoController.java` exposto no endpoint `/notificacao`.
+  - Implementei regras de criação de mensagens estruturadas por tipo (`LIVRO_DISPONIVEL`, `EMPRESTIMO_VENCENDO`, `EMPRESTIMO_ATRASADO`), marcação de lida unitária/global e contagem de não lidas.
+- **Interfaces e Serviços de Fila de Espera e Notificações no Frontend:**
+  - Criei os serviços `waitlist.service.ts` e `notification.service.ts` com suporte total a dual-mode (mock local via `MockDataService` e consumo de API real baseado na flag `USE_MOCK`).
+  - Adicionei dados de exemplo na base mockada para simular filas ativas e mensagens de teste.
+- **Centro de Notificações no Frontend (RF06):**
+  - Criei a tela `/notifications` com layout de lista dinâmico usando `@if` e `@for` control flows, agrupando os avisos por tipo com ícones dinâmicos do Material Design, marcação visual de não lidas e botões de ação rápidos de leitura e leitura global.
+- **Badge do Sino Dinâmico no Header:**
+  - Conectei o botão de notificações do `HeaderComponent` ao `unreadCount` reativo do `NotificationService`, exibindo em tempo real e de forma animada o número de mensagens pendentes de leitura.
+- **Ações de Fila de Espera no Catálogo de Livros (RF05):**
+  - Atualizei a listagem do catálogo `/books`. Para livros com cópias esgotadas (`availableCopies === 0`), exibo um botão de "Entrar na Fila" ou "Sair da Fila", calculando os status em tempo real com base no usuário logado.
+
+### Alterado
+- **Estrutura de Rotas e Sidebar:**
+  - Registrei a rota lazy-loaded de `/notifications` no `app.routes.ts`.
+  - Inseri o atalho de Notificações com badge contador dinâmico na Sidebar de navegação lateral para todos os perfis.
+
+---
+
 ## [2026-07-14] — Temas/Idiomas, Solicitação de Empréstimos, Auditoria Real e Correções Críticas de API
 
 ### Adicionado

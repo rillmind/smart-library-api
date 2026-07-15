@@ -72,8 +72,8 @@ Lista de funcionalidades mapeadas e o status da implementação no sistema:
 | **RF02** | Cadastrar livros | Desenvolvimento do formulário reativo e operações de cadastro, edição e remoção de livros | ✅ **Concluído** |
 | **RF03** | Registrar empréstimos | Desenvolvimento do fluxo de registro, renovação e devolução de empréstimos na interface administrativa | ✅ **Concluído** |
 | **RF04** | Registrar devoluções | Implementação da interface de devolução de livros com impacto em tempo real nas cópias do acervo | ✅ **Concluído** |
-| **RF05** | Fila de espera | Planejado para a próxima sprint | 📋 *Planejado* |
-| **RF06** | Enviar notificações | Planejado para a próxima sprint | 📋 *Planejado* |
+| **RF05** | Fila de espera | Sistema de fila de espera para livros indisponíveis integrado ao fluxo de acervo e devolução | ✅ **Concluído** |
+| **RF06** | Enviar notificações | Sistema de notificações in-app avisando sobre livros disponíveis e status de empréstimos | ✅ **Concluído** |
 | **RF07** | Permitir reservas online | Desenvolvimento da solicitação direta de empréstimos pelo aluno no acervo de livros | ✅ **Concluído** |
 | **RF08** | Histórico de utilização | Desenvolvimento da tabela de histórico de empréstimos do usuário | ✅ **Concluído** |
 | **RF09** | Múltiplas bibliotecas | Adicionado suporte a filiais e seletores no Sidebar/Cadastro | ✅ **Concluído** |

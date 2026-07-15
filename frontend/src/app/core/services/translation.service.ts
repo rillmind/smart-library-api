@@ -174,6 +174,9 @@ export class TranslationService {
       'Sistema': 'Sistema',
       'Administrador': 'Administrador',
       'Usuário': 'Usuário',
+      notifications_center: 'Central de Notificações',
+      mark_all_read: 'Marcar todas como lidas',
+      no_notifications: 'Nenhuma notificação encontrada.',
     },
     'en': {
       dashboard: 'Dashboard',
@@ -340,6 +343,9 @@ export class TranslationService {
       'Sistema': 'System',
       'Administrador': 'Administrator',
       'Usuário': 'User',
+      notifications_center: 'Notification Center',
+      mark_all_read: 'Mark all as read',
+      no_notifications: 'No notifications found.',
     },
     'es': {
       dashboard: 'Tablero',
@@ -506,6 +512,9 @@ export class TranslationService {
       'Sistema': 'Sistema',
       'Administrador': 'Administrador',
       'Usuário': 'Usuario',
+      notifications_center: 'Centro de Notificaciones',
+      mark_all_read: 'Marcar todas como leídas',
+      no_notifications: 'No se encontraron notificaciones.',
     },
   };
 

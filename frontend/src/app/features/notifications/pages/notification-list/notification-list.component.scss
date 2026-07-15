@@ -1,0 +1,103 @@
+.notifications {
+  padding: var(--spacing-lg);
+  max-width: 900px;
+  margin: 0 auto;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-lg);
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+  }
+
+  &__empty {
+    text-align: center;
+    padding: var(--spacing-2xl);
+    color: var(--color-text-secondary);
+
+    mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      margin-bottom: var(--spacing-md);
+      color: var(--color-text-disabled);
+    }
+
+    p {
+      margin: 0;
+      font-size: var(--font-size-md);
+    }
+  }
+}
+
+.notification-card {
+  margin-bottom: var(--spacing-md);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-md);
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+  transition: background var(--transition-fast);
+  cursor: default;
+
+  &--unread {
+    background-color: var(--color-primary-light);
+    border-left: 3px solid var(--color-primary);
+  }
+
+  &__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  &__content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__title {
+    font-weight: 600;
+    font-size: var(--font-size-md);
+    color: var(--color-text-primary);
+    margin-bottom: 2px;
+  }
+
+  &__message {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-xs);
+  }
+
+  &__date {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-disabled);
+  }
+
+  &__actions {
+    flex-shrink: 0;
+  }
+}
+
+.icon--success {
+  background: var(--color-success-light);
+  color: var(--color-success);
+}
+
+.icon--warning {
+  background: var(--color-warning-light);
+  color: var(--color-warning);
+}
+
+.icon--error {
+  background: var(--color-error-light);
+  color: var(--color-error);
+}

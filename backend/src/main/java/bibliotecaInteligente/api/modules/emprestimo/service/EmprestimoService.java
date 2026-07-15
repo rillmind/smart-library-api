@@ -19,6 +19,9 @@ public class EmprestimoService {
     @org.springframework.beans.factory.annotation.Autowired
     private bibliotecaInteligente.api.modules.livro.service.LivroService livroService;
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private bibliotecaInteligente.api.modules.fila.service.FilaEsperaService filaEsperaService;
+
     public EmprestimoService(EmprestimoRpository emprestimoRpository) {
         this.emprestimoRpository = emprestimoRpository;
     }
@@ -66,6 +69,13 @@ public class EmprestimoService {
         emprestimo.setData_devolucao(java.time.LocalDate.now().toString());
         emprestimoRpository.save(emprestimo);
         auditLogService.registrarLog("Livro devolvido: Empréstimo ID " + id, "Administrador");
+        try {
+            if (emprestimo.getId_livro() != null) {
+                filaEsperaService.notificarProximo(emprestimo.getId_livro().getId());
+            }
+        } catch (Exception e) {
+            // Silencioso para não bloquear a devolução do livro
+        }
     }
     public void renovarEmprestimo(Integer id) {
         Emprestimo emprestimo = buscarEmprestimoPorId(id);

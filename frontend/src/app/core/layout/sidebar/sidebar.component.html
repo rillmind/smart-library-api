@@ -28,6 +28,9 @@
         >
           <mat-icon class="sidebar__item-icon">{{ item.icon }}</mat-icon>
           <span class="sidebar__item-label">{{ item.label }}</span>
+          @if (item.route === '/notifications' && notificationService.unreadCount() > 0) {
+            <span class="sidebar__badge">{{ notificationService.unreadCount() }}</span>
+          }
         </a>
       }
     </div>
