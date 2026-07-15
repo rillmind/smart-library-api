@@ -1,90 +1,152 @@
 # Smart Library — Monorepo
 
-Organizei o projeto no formato de monorepo para centralizar os códigos das equipes de frontend e backend em um único repositório, facilitando a organização das pastas.
+Sistema inteligente de gestão e compartilhamento de biblioteca, projetado no formato de monorepo para centralizar a infraestrutura do backend e a interface do frontend em um único repositório.
 
 ---
 
 ## 🚀 Tecnologias Utilizadas
 
-- **Core:** Angular 21 (utilização de Componentes Standalone e Signals para gerenciamento de estado moderno).
-- **Design System:** Angular Material para os componentes de interface (UI) e SCSS para customizações.
-- **Estilização:** CSS Vanilla com variáveis customizadas para facilitar a manutenção de cores e espaçamentos.
+### Frontend
+- **Framework:** Angular 21 (Componentes Standalone e Signals para gerenciamento de estado reativo).
+- **Design System:** Angular Material para os componentes de interface (UI) e SCSS para customizações de visual.
+- **Estilização:** CSS Vanilla com variáveis customizadas para o sistema de temas (Claro e Escuro).
 - **Tipografia:** Fonte *Inter* integrada diretamente do Google Fonts.
-- **Testes:** Vitest.
 - **Gerenciador de Pacotes:** npm.
+
+### Backend
+- **Core:** Java 21 + Spring Boot 3.x.
+- **Segurança:** Spring Security 6 (autenticação baseada em sessão com persistência no cache do Redis).
+- **Persistência:** Spring Data JPA + PostgreSQL.
+- **Cache e Sessão:** Redis.
+- **Documentação:** OpenAPI 3 / Swagger UI.
 
 ---
 
 ## 📂 Estrutura de Pastas
 
-Estruturei o monorepo dividindo os escopos de frontend e backend da seguinte forma:
+A estrutura do monorepo organiza as pastas de frontend e backend da seguinte forma:
 
 ```text
 Biblioteca/ (raiz)
-├── backend/                   # API Java / Spring Boot (equipe separada)
-├── frontend/                  # Aplicação Angular 21 (meu escopo)
+├── backend/                                   # API Java / Spring Boot
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/bibliotecaInteligente/api/
+│   │   │   │   ├── config/                    # Configurações de Segurança e OpenAPI
+│   │   │   │   ├── modules/                   # Módulos de domínio da aplicação
+│   │   │   │   │   ├── emprestimo/            # Entidades, regras e rotas de empréstimos
+│   │   │   │   │   ├── livro/                 # Entidades, regras e rotas de livros
+│   │   │   │   │   └── user/                  # Entidades, regras, rotas de usuários e logs
+│   │   │   │   └── ApiApplication.java        # Classe de inicialização do Spring Boot
+│   │   │   └── resources/
+│   │   │       └── application.properties     # Configurações de conexão e variáveis
+│   │   └── test/                              # Testes unitários e de integração
+│   ├── Dockerfile                             # Configuração de build da imagem da API
+│   ├── docker-compose.yml                     # Orquestração do Postgres, Redis e API
+│   └── pom.xml                                # Dependências e dependências Maven
+│
+├── frontend/                                  # Aplicação Angular 21
 │   ├── src/
 │   │   ├── app/
-│   │   │   ├── core/          # Recursos globais e comuns da aplicação (layouts, models, guards)
-│   │   │   ├── features/      # Módulos com lazy loading (dashboard, auth, books, loans, users)
-│   │   │   ├── shared/        # Recursos compartilhados (MockDataService)
+│   │   │   ├── core/                          # Recursos globais (layouts, services, guards, interceptors)
+│   │   │   ├── features/                      # Módulos com lazy loading (dashboard, auth, books, loans, users, audit)
+│   │   │   ├── shared/                        # Componentes e serviços compartilhados (MockDataService)
 │   │   │   ├── app.component.ts
 │   │   │   ├── app.config.ts
 │   │   │   └── app.routes.ts
-│   │   ├── assets/            # Arquivos estáticos
 │   │   ├── index.html
 │   │   ├── main.ts
 │   │   └── styles.scss
+│   └── package.json                           # Dependências e scripts npm
 ```
 
 ---
 
 ## 📋 Status das Tarefas (Requisitos Funcionais)
 
-Lista de funcionalidades mapeadas e o status atual da implementação no frontend:
+Lista de funcionalidades mapeadas e o status da implementação no sistema:
 
 | ID | Requisito | O que foi feito / O que resta | Status |
 | :--- | :--- | :--- | :---: |
-| **RF01** | Cadastrar usuários | Desenvolvidas as operações de cadastro, edição e controle de bloqueio de usuários no frontend | ✅ **Concluído** |
-| **RF02** | Cadastrar livros | Desenvolvido o formulário reativo e as operações de cadastro, edição e remoção de livros | ✅ **Concluído** |
-| **RF03** | Registrar empréstimos | Desenvolvido o fluxo de registro, renovação e devolução de empréstimos na interface administrativa | ✅ **Concluído** |
-| **RF04** | Registrar devoluções | Implementada a interface de devolução de livros com impacto em tempo real nas cópias do acervo | ✅ **Concluído** |
+| **RF01** | Cadastrar usuários | Desenvolvimento das operações de cadastro e controle de bloqueio de usuários. O registro de novos membros é feito pelo portal de Login | ✅ **Concluído** |
+| **RF02** | Cadastrar livros | Desenvolvimento do formulário reativo e operações de cadastro, edição e remoção de livros | ✅ **Concluído** |
+| **RF03** | Registrar empréstimos | Desenvolvimento do fluxo de registro, renovação e devolução de empréstimos na interface administrativa | ✅ **Concluído** |
+| **RF04** | Registrar devoluções | Implementação da interface de devolução de livros com impacto em tempo real nas cópias do acervo | ✅ **Concluído** |
 | **RF05** | Fila de espera | Planejado para a próxima sprint | 📋 *Planejado* |
 | **RF06** | Enviar notificações | Planejado para a próxima sprint | 📋 *Planejado* |
-| **RF07** | Permitir reservas online | Planejado para a próxima sprint | 📋 *Planejado* |
-| **RF08** | Histórico de utilização | Desenvolvida a tabela de histórico de empréstimos do usuário | ✅ **Concluído** |
+| **RF07** | Permitir reservas online | Desenvolvimento da solicitação direta de empréstimos pelo aluno no acervo de livros | ✅ **Concluído** |
+| **RF08** | Histórico de utilização | Desenvolvimento da tabela de histórico de empréstimos do usuário | ✅ **Concluído** |
 | **RF09** | Múltiplas bibliotecas | Adicionado suporte a filiais e seletores no Sidebar/Cadastro | ✅ **Concluído** |
 | **RF10** | Recomendação inteligente | Modelagem dos dados preparada nas classes de modelo da aplicação | ✅ **Concluído** |
 
 ---
 
+## 🔌 Integração Frontend e Backend
+
+A integração do frontend com a API real do backend local conta com as seguintes características:
+- **Chaveamento Dinâmico (Mock vs API Real):** O arquivo `api.config.ts` gerencia o chaveamento do ambiente. Alterando a constante `USE_MOCK` para `false`, todo o fluxo de dados do frontend passa a consumir diretamente a API do Spring Boot na porta `8080`.
+- **Autenticação e Sessão:** O interceptor de credenciais `credentials.interceptor.ts` injeta a propriedade `withCredentials: true` nas requisições HTTP do Angular, permitindo o armazenamento e transmissão do cookie de sessão (`JSESSIONID`) exigido pelo Spring Security.
+- **Auditoria de Logs:** Sistema de auditoria de logs gravado no banco de dados PostgreSQL e consumido pela interface de Logs do frontend, fornecendo rastreabilidade em tempo real de todas as ações administrativas.
+- **Tratamento Global de Erros:** O interceptor global de erros HTTP exibe caixas de alerta (`MatSnackBar`) animadas toda vez que o servidor rejeita uma requisição (ex: CPF já cadastrado ou credenciais inválidas).
+- **Múltiplos Idiomas e Temas:** O `TranslationService` gerencia traduções reativas em Português, Inglês e Espanhol. O visual escuro é aplicado através da classe `.dark-theme` com variáveis de cores customizadas aplicadas no `document.documentElement` com persistência no LocalStorage.
+- **Mapeamento de Dados:** Adaptação do modelo simplificado das entidades do backend para a tipagem do frontend através de classes de mapeamento nos serviços Angular (`BookService`, `UserService` e `LoanService`).
+
+---
+
 ## ⚙️ Como rodar o projeto localmente
 
-Para rodar e testar a nossa aplicação localmente:
+### Pré-requisitos
+- **Java JDK 21**
+- **Node.js (versão 18 ou superior)**
+- **Docker e Docker Desktop**
 
-1. Clonar o repositório principal.
-2. Acessar a pasta do frontend:
-   ```bash
-   cd frontend
-   ```
-3. Instalar as dependências necessárias do Angular:
-   ```bash
-   npm install
-   ```
-4. Subir o servidor de desenvolvimento:
-   ```bash
-   npm start
-   ```
-5. Acessar `http://localhost:4200/` no seu navegador. O servidor local roda com live-reload, atualizando tudo na hora em que salvamos os arquivos.
+### 1. Inicializar os Serviços de Infraestrutura (Banco e Cache)
+Inicie os contêineres do PostgreSQL e do Redis a partir do diretório raiz:
+```bash
+cd backend
+docker compose up -d postgres-db redis-cache
+```
+
+### 2. Rodar o Backend (API Spring Boot)
+Existem duas formas de executar o backend da aplicação:
+
+#### Opção A: Rodar como contêiner Docker (Pronto para uso)
+Se desejar executar a API já compilada no contêiner:
+```bash
+docker compose up -d --build api-service
+```
+
+#### Opção B: Rodar via terminal com Maven (Ideal para depuração)
+Se desejar executar a API diretamente no console local (com o banco e cache já rodando no Docker):
+```bash
+# No diretório backend/
+# Compilar e empacotar
+./mvnw.cmd package -DskipTests
+# Rodar a aplicação
+./mvnw.cmd spring-boot:run
+```
+A API iniciará no endereço `http://localhost:8080`.
+A documentação interativa do Swagger poderá ser acessada em `http://localhost:8080/swagger-ui/index.html`.
+
+### 3. Rodar o Frontend (Angular)
+Acesse a pasta do frontend e inicie a interface do usuário:
+```bash
+cd ../frontend
+# Instalar as dependências do projeto
+npm install
+# Iniciar o servidor de desenvolvimento do Angular
+npm start
+```
+O frontend ficará disponível em `http://localhost:4200/`.
 
 ---
 
 ## 🎨 Convenções e Padrões Adotados
 
 Diretrizes e padrões adotados no desenvolvimento para garantir a padronização do código:
-- **Nomes de pastas e arquivos:** Sempre em inglês e em formato kebab-case (ex: `user-profile.component.ts`).
+- **Nomes de pastas e arquivos:** kebab-case (ex: `user-profile.component.ts`).
 - **Nomes no código:** camelCase para variáveis/métodos e PascalCase para classes/interfaces.
-- **Signals:** Utilização de Signals (`signal()`) do Angular em todas as reatividades locais.
+- **Signals:** Utilização de Signals do Angular para gerenciamento de estado reativo.
 - **Estruturas no HTML:** Utilização da nova sintaxe de control flow (`@if`, `@for`, `@switch`) do Angular 21.
-- **Internacionalização:** Configuração da localização global para `pt-BR` no `app.config.ts`, permitindo a formatação automática de datas e meses em português.
-- **Controle de Acesso (RBAC):** Proteção de rotas e adaptação dinâmica da interface por meio de guards funcionais baseados no papel do usuário ativo (Administrador vs Membro).
+- **Internacionalização:** Configuração da localização global para `pt-BR` no `app.config.ts`, permitindo a formatação automática de datas e números.
+- **Controle de Acesso (RBAC):** Proteção de rotas e adaptação da interface por meio de guards baseados no papel do usuário ativo (Administrador vs Membro).
