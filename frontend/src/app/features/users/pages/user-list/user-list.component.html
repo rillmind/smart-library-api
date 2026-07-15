@@ -1,19 +1,15 @@
 <div class="user-list animate-fade-in">
   <div class="user-list__header">
     <div>
-      <h1 class="page-title">Usuários</h1>
-      <p class="page-subtitle">Gerenciamento de membros da instituição</p>
+      <h1 class="page-title">{{ translationService.translate('users') }}</h1>
+      <p class="page-subtitle">{{ translationService.translate('users_subtitle') }}</p>
     </div>
-    <button mat-flat-button color="primary" (click)="openUserForm(userFormTemplate)">
-      <mat-icon>add</mat-icon>
-      Novo Usuário
-    </button>
   </div>
 
   <div class="card">
     <table mat-table [dataSource]="users()" class="user-list__table">
       <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef>Nome</th>
+        <th mat-header-cell *matHeaderCellDef>{{ translationService.translate('name') }}</th>
         <td mat-cell *matCellDef="let user">
           <div class="user-list__name-cell">
             <span class="user-list__user-name">{{ user.name }}</span>
@@ -22,31 +18,31 @@
       </ng-container>
 
       <ng-container matColumnDef="enrollment">
-        <th mat-header-cell *matHeaderCellDef>Matrícula</th>
+        <th mat-header-cell *matHeaderCellDef>CPF</th>
         <td mat-cell *matCellDef="let user">{{ user.enrollment }}</td>
       </ng-container>
 
       <ng-container matColumnDef="email">
-        <th mat-header-cell *matHeaderCellDef>E-mail</th>
+        <th mat-header-cell *matHeaderCellDef>{{ translationService.translate('email') }}</th>
         <td mat-cell *matCellDef="let user">{{ user.email }}</td>
       </ng-container>
 
       <ng-container matColumnDef="type">
-        <th mat-header-cell *matHeaderCellDef>Tipo</th>
-        <td mat-cell *matCellDef="let user">{{ typeLabels[user.type] }}</td>
+        <th mat-header-cell *matHeaderCellDef>{{ translationService.translate('type') }}</th>
+        <td mat-cell *matCellDef="let user">{{ translationService.translate(user.type) }}</td>
       </ng-container>
 
       <ng-container matColumnDef="status">
-        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <th mat-header-cell *matHeaderCellDef>{{ translationService.translate('status') }}</th>
         <td mat-cell *matCellDef="let user">
           <span class="status-badge" [class.status-badge--active]="user.active" [class.status-badge--inactive]="!user.active">
-            {{ user.active ? 'Ativo' : 'Inativo' }}
+            {{ user.active ? translationService.translate('active') : translationService.translate('inactive') }}
           </span>
         </td>
       </ng-container>
 
       <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef>Ações</th>
+        <th mat-header-cell *matHeaderCellDef>{{ translationService.translate('actions') }}</th>
         <td mat-cell *matCellDef="let user">
           <button mat-icon-button color="primary" (click)="openUserForm(userFormTemplate, user)" aria-label="Editar membro" type="button" style="margin-right: 4px;">
             <mat-icon>edit</mat-icon>
@@ -66,9 +62,9 @@
 <ng-template #userFormTemplate>
   <div class="loan-detail-dialog">
     <div class="loan-detail-dialog__header">
-      <h2 mat-dialog-title class="loan-detail-dialog__title">
+      <h2 mat-dialog-title class="loan-dialog-title" style="color: var(--color-text-primary) !important;">
         <mat-icon>{{ isEditing() ? 'edit' : 'person_add' }}</mat-icon>
-        {{ isEditing() ? 'Editar Membro' : 'Cadastrar Novo Membro' }}
+        {{ isEditing() ? translationService.translate('edit_member') : translationService.translate('register_new_member') }}
       </h2>
       <button mat-icon-button mat-dialog-close aria-label="Fechar">
         <mat-icon>close</mat-icon>
@@ -79,7 +75,7 @@
       <mat-dialog-content class="loan-detail-dialog__content">
         <div class="loan-detail-dialog__section">
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Nome Completo</mat-label>
+            <mat-label>{{ translationService.translate('name') }}</mat-label>
             <input matInput formControlName="name" placeholder="Ex: João da Silva">
             @if (userForm.controls.name.touched && userForm.controls.name.invalid) {
               <mat-error>O nome é obrigatório (mín. 2 caracteres).</mat-error>
@@ -87,7 +83,7 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>E-mail Institucional</mat-label>
+            <mat-label>{{ translationService.translate('email_institutional') }}</mat-label>
             <input matInput type="email" formControlName="email" placeholder="Ex: joao@ifpe.edu.br">
             @if (userForm.controls.email.touched && userForm.controls.email.invalid) {
               <mat-error>Digite um e-mail válido.</mat-error>
@@ -96,15 +92,15 @@
 
           <div class="loan-detail-dialog__grid" style="margin-bottom: 8px;">
             <mat-form-field appearance="outline">
-              <mat-label>Matrícula / ID</mat-label>
-              <input matInput formControlName="enrollment" placeholder="Ex: 2024001">
+              <mat-label>{{ translationService.translate('cpf_label') }}</mat-label>
+              <input matInput formControlName="enrollment" placeholder="Ex: 11144477735">
               @if (userForm.controls.enrollment.touched && userForm.controls.enrollment.invalid) {
-                <mat-error>A matrícula é obrigatória.</mat-error>
+                <mat-error>CPF obrigatório (11 dígitos).</mat-error>
               }
             </mat-form-field>
 
             <mat-form-field appearance="outline">
-              <mat-label>Telefone</mat-label>
+              <mat-label>{{ translationService.translate('phone') }}</mat-label>
               <input matInput formControlName="phone" placeholder="Ex: (11) 99999-0000">
               @if (userForm.controls.phone.touched && userForm.controls.phone.invalid) {
                 <mat-error>O telefone é obrigatório.</mat-error>
@@ -114,19 +110,19 @@
 
           <div class="loan-detail-dialog__grid" style="margin-bottom: 8px;">
             <mat-form-field appearance="outline">
-              <mat-label>Tipo de Membro</mat-label>
+              <mat-label>{{ translationService.translate('member_type') }}</mat-label>
               <mat-select formControlName="type">
-                <mat-option value="STUDENT">Aluno</mat-option>
-                <mat-option value="PROFESSOR">Professor</mat-option>
-                <mat-option value="STAFF">Funcionário</mat-option>
+                <mat-option value="STUDENT">{{ translationService.translate('STUDENT') }}</mat-option>
+                <mat-option value="PROFESSOR">{{ translationService.translate('PROFESSOR') }}</mat-option>
+                <mat-option value="STAFF">{{ translationService.translate('STAFF') }}</mat-option>
               </mat-select>
             </mat-form-field>
 
             <mat-form-field appearance="outline">
-              <mat-label>Biblioteca Vinculada</mat-label>
+              <mat-label>{{ translationService.translate('library') }}</mat-label>
               <mat-select formControlName="libraryId">
                 @for (lib of libraries(); track lib.id) {
-                  <mat-option [value]="lib.id">{{ lib.name }}</mat-option>
+                  <mat-option [value]="lib.id">{{ translationService.translate(lib.name) }}</mat-option>
                 }
               </mat-select>
             </mat-form-field>
@@ -135,9 +131,9 @@
       </mat-dialog-content>
 
       <mat-dialog-actions align="end" class="loan-detail-dialog__actions">
-        <button mat-button mat-dialog-close type="button">Cancelar</button>
+        <button mat-button mat-dialog-close type="button">{{ translationService.translate('cancel') }}</button>
         <button mat-flat-button color="primary" type="submit" [disabled]="userForm.invalid">
-          Salvar Cadastro
+          {{ translationService.translate('save_registration') }}
         </button>
       </mat-dialog-actions>
     </form>

@@ -1,45 +1,75 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal, TemplateRef } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTableModule } from '@angular/material/table';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { DatePipe } from '@angular/common';
-import { MockDataService } from '../../../../shared/services/mock-data.service';
+import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { User, USER_TYPE_LABELS } from '../../../../core/models/user.model';
 import { Loan, LOAN_STATUS_LABELS } from '../../../../core/models/loan.model';
 import { AuthService } from '../../../../core/services/auth.service';
+import { LoanService } from '../../../../core/services/loan.service';
+import { UserService } from '../../../../core/services/user.service';
+import { TranslationService } from '../../../../core/services/translation.service';
 
 @Component({
   selector: 'app-user-profile',
   standalone: true,
-  imports: [MatCardModule, MatIconModule, MatButtonModule, MatDividerModule, MatChipsModule, MatTableModule, DatePipe],
+  imports: [
+    MatCardModule,
+    MatIconModule,
+    MatButtonModule,
+    MatDividerModule,
+    MatChipsModule,
+    MatTableModule,
+    MatDialogModule,
+    MatFormFieldModule,
+    MatInputModule,
+    DatePipe,
+    FormsModule,
+    ReactiveFormsModule,
+  ],
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.scss',
 })
 export class UserProfileComponent implements OnInit {
-  private mockData = inject(MockDataService);
-  private authService = inject(AuthService);
+  authService = inject(AuthService);
+  private loanService = inject(LoanService);
+  private userService = inject(UserService);
+  private dialog = inject(MatDialog);
+  translationService = inject(TranslationService);
 
   user = signal<User | null>(null);
-
   userLoans = signal<Loan[]>([]);
-
   userStats = signal({ totalLoans: 0, activeLoans: 0, overdueLoans: 0, returnedLoans: 0 });
 
   typeLabels = USER_TYPE_LABELS;
-
   statusLabels: Record<string, string> = LOAN_STATUS_LABELS;
-
   displayedColumns = ['bookTitle', 'loanDate', 'dueDate', 'returnDate', 'status'];
+
+  editProfileForm = new FormGroup({
+    name: new FormControl('', { validators: [Validators.required], nonNullable: true }),
+    email: new FormControl('', { validators: [Validators.required, Validators.email], nonNullable: true }),
+    password: new FormControl(''),
+  });
 
   ngOnInit(): void {
     const currentUser = this.authService.currentUser();
     if (currentUser) {
       this.user.set(currentUser);
-      this.userLoans.set(this.mockData.getLoansByUserId(currentUser.id));
-      this.userStats.set(this.mockData.getUserStats(currentUser.id));
+      this.loanService.getLoansByUserId(currentUser.id).subscribe((loans) => {
+        this.userLoans.set(loans);
+        const totalLoans = loans.length;
+        const activeLoans = loans.filter((l) => l.status === 'ACTIVE').length;
+        const overdueLoans = loans.filter((l) => l.status === 'OVERDUE').length;
+        const returnedLoans = loans.filter((l) => l.status === 'RETURNED').length;
+        this.userStats.set({ totalLoans, activeLoans, overdueLoans, returnedLoans });
+      });
     }
   }
 
@@ -60,5 +90,44 @@ export class UserProfileComponent implements OnInit {
       RESERVED: 'status-badge--reserved',
     };
     return map[status] || '';
+  }
+
+  openEditProfile(template: TemplateRef<any>): void {
+    const currentUser = this.user();
+    if (currentUser) {
+      this.editProfileForm.patchValue({
+        name: currentUser.name,
+        email: currentUser.email,
+        password: '',
+      });
+      this.dialog.open(template, {
+        width: '450px',
+        panelClass: 'custom-dialog-container',
+      });
+    }
+  }
+
+  submitEditProfile(): void {
+    if (this.editProfileForm.invalid) return;
+
+    const currentUser = this.user();
+    if (currentUser) {
+      const { name, email, password } = this.editProfileForm.getRawValue();
+      const updatedData: any = {
+        name,
+        email,
+        enrollment: currentUser.enrollment,
+      };
+      if (password) {
+        updatedData.password = password;
+      }
+
+      this.userService.updateUser(currentUser.id, updatedData).subscribe(() => {
+        const updatedUser = { ...currentUser, name, email };
+        this.authService.currentUser.set(updatedUser);
+        this.user.set(updatedUser);
+        this.dialog.closeAll();
+      });
+    }
   }
 }

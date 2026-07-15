@@ -8,11 +8,14 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { DatePipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
-import { MockDataService } from '../../../../shared/services/mock-data.service';
+import { LoanService } from '../../../../core/services/loan.service';
+import { BookService } from '../../../../core/services/book.service';
+import { UserService } from '../../../../core/services/user.service';
 import { Loan, LOAN_STATUS_LABELS, LoanStatus } from '../../../../core/models/loan.model';
 import { Book } from '../../../../core/models/book.model';
 import { User } from '../../../../core/models/user.model';
 import { AuthService } from '../../../../core/services/auth.service';
+import { TranslationService } from '../../../../core/services/translation.service';
 
 @Component({
   selector: 'app-loan-list',
@@ -34,6 +37,11 @@ import { AuthService } from '../../../../core/services/auth.service';
 })
 export class LoanListComponent implements OnInit {
   authService = inject(AuthService);
+  private loanService = inject(LoanService);
+  private bookService = inject(BookService);
+  private userService = inject(UserService);
+  private dialog = inject(MatDialog);
+  translationService = inject(TranslationService);
 
   loans = signal<Loan[]>([]);
   searchQuery = signal<string>('');
@@ -46,7 +54,7 @@ export class LoanListComponent implements OnInit {
 
   displayedColumns = computed(() => {
     if (this.authService.isAdmin()) {
-      return ['bookTitle', 'userName', 'loanDate', 'dueDate', 'returnDate', 'status'];
+      return ['bookTitle', 'userName', 'loanDate', 'dueDate', 'returnDate', 'status', 'actions'];
     }
     return ['bookTitle', 'loanDate', 'dueDate', 'returnDate', 'status'];
   });
@@ -77,10 +85,7 @@ export class LoanListComponent implements OnInit {
     return list;
   });
 
-  constructor(
-    private mockDataService: MockDataService,
-    private dialog: MatDialog
-  ) {}
+
 
   ngOnInit(): void {
     this.loadData();
@@ -89,11 +94,11 @@ export class LoanListComponent implements OnInit {
   loadData(): void {
     const user = this.authService.currentUser();
     if (this.authService.isAdmin()) {
-      this.loans.set(this.mockDataService.getLoans());
-      this.users.set(this.mockDataService.getUsers().filter((u) => u.active));
-      this.books.set(this.mockDataService.getBooks().filter((b) => b.availableCopies > 0));
+      this.loanService.getLoans().subscribe((loans) => this.loans.set([...loans]));
+      this.userService.getUsers().subscribe((users) => this.users.set([...users.filter((u) => u.active)]));
+      this.bookService.getBooks().subscribe((books) => this.books.set([...books.filter((b) => b.availableCopies > 0)]));
     } else if (user) {
-      this.loans.set(this.mockDataService.getLoansByUserId(user.id));
+      this.loanService.getLoansByUserId(user.id).subscribe((loans) => this.loans.set([...loans]));
       this.users.set([]);
       this.books.set([]);
     }
@@ -137,13 +142,13 @@ export class LoanListComponent implements OnInit {
 
   submitNewLoan(): void {
     if (this.newLoanForm.invalid) return;
-
+ 
     const { userId, bookId, dueDate } = this.newLoanForm.getRawValue();
     const user = this.users().find((u) => u.id === userId);
     const book = this.books().find((b) => b.id === bookId);
-
+ 
     if (user && book) {
-      this.mockDataService.addLoan({
+      const newLoanData = {
         userId,
         userName: user.name,
         bookId,
@@ -151,31 +156,28 @@ export class LoanListComponent implements OnInit {
         loanDate: new Date(),
         dueDate: new Date(dueDate),
         returnDate: null,
-        status: 'ACTIVE',
+        status: 'ACTIVE' as LoanStatus,
         libraryId: user.libraryId,
-        acceptedBy: 'Gustavo de Lima',
+      };
+ 
+      this.loanService.addLoan(newLoanData).subscribe(() => {
+        this.loadData();
+        this.dialog.closeAll();
       });
-
-      this.loadData();
-      this.dialog.closeAll();
     }
   }
 
   renew(id: string): void {
-    const updated = this.mockDataService.renewLoan(id);
-    if (updated) {
+    this.loanService.renovarEmprestimo(id).subscribe(() => {
       this.loadData();
-      this.selectedLoan.set(updated);
       this.dialog.closeAll();
-    }
+    });
   }
 
   returnLoan(id: string): void {
-    const updated = this.mockDataService.returnLoan(id);
-    if (updated) {
+    this.loanService.devolverEmprestimo(id).subscribe(() => {
       this.loadData();
-      this.selectedLoan.set(updated);
       this.dialog.closeAll();
-    }
+    });
   }
 }

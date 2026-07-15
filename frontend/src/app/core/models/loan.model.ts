@@ -10,7 +10,7 @@ export interface Loan {
   returnDate: Date | null;
   status: LoanStatus;
   libraryId: string;
-  acceptedBy: string;
+  acceptedBy?: string;
 }
 
 export type LoanStatus = 'ACTIVE' | 'RETURNED' | 'OVERDUE' | 'RESERVED';

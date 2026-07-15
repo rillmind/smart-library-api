@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "tb_livros")
@@ -59,5 +60,5 @@ public class Livro {
     @Schema(
             description = "Histórico de empréstimos associados ao livro"
     )
-    private ArrayList<Emprestimo> livros;
+    private List<Emprestimo> livros;
 }

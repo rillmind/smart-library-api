@@ -5,4 +5,8 @@
   padding: var(--spacing-lg);
   background: var(--color-background);
   transition: margin-left var(--transition-slow);
+
+  &--collapsed {
+    margin-left: var(--sidebar-collapsed-width);
+  }
 }

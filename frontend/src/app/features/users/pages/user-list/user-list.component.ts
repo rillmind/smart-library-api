@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, TemplateRef } from '@angular/core';
+import { Component, OnInit, signal, TemplateRef, inject } from '@angular/core';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,8 +8,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { MockDataService } from '../../../../shared/services/mock-data.service';
+import { UserService } from '../../../../core/services/user.service';
 import { User, USER_TYPE_LABELS } from '../../../../core/models/user.model';
 import { Library } from '../../../../core/models/library.model';
+import { TranslationService } from '../../../../core/services/translation.service';
 
 @Component({
   selector: 'app-user-list',
@@ -33,6 +35,7 @@ export class UserListComponent implements OnInit {
   libraries = signal<Library[]>([]);
   displayedColumns: string[] = ['name', 'enrollment', 'email', 'type', 'status', 'actions'];
   typeLabels: Record<string, string> = USER_TYPE_LABELS;
+  translationService = inject(TranslationService);
 
   isEditing = signal(false);
   editingUserId: string | null = null;
@@ -41,13 +44,14 @@ export class UserListComponent implements OnInit {
     name: new FormControl('', { validators: [Validators.required, Validators.minLength(2)], nonNullable: true }),
     email: new FormControl('', { validators: [Validators.required, Validators.email], nonNullable: true }),
     phone: new FormControl('', { validators: [Validators.required], nonNullable: true }),
-    enrollment: new FormControl('', { validators: [Validators.required], nonNullable: true }),
+    enrollment: new FormControl('', { validators: [Validators.required, Validators.pattern(/^\d{11}$/)], nonNullable: true }),
     type: new FormControl<'STUDENT' | 'PROFESSOR' | 'STAFF'>('STUDENT', { validators: [Validators.required], nonNullable: true }),
     libraryId: new FormControl('1', { validators: [Validators.required], nonNullable: true }),
   });
 
   constructor(
     private mockDataService: MockDataService,
+    private userService: UserService,
     private dialog: MatDialog
   ) {}
 
@@ -56,8 +60,8 @@ export class UserListComponent implements OnInit {
   }
 
   loadData(): void {
-    this.users.set(this.mockDataService.getUsers());
-    this.libraries.set(this.mockDataService.getLibraries());
+    this.userService.getUsers().subscribe((users) => this.users.set([...users]));
+    this.libraries.set([...this.mockDataService.getLibraries()]);
   }
 
   openUserForm(template: TemplateRef<any>, user?: User): void {
@@ -93,24 +97,32 @@ export class UserListComponent implements OnInit {
 
   submitUserForm(): void {
     if (this.userForm.invalid) return;
-
+ 
     const formValue = this.userForm.getRawValue();
     if (this.isEditing() && this.editingUserId) {
-      this.mockDataService.updateUser(this.editingUserId, formValue);
+      this.userService.updateUser(this.editingUserId, formValue).subscribe(() => {
+        this.loadData();
+        this.dialog.closeAll();
+      });
     } else {
-      this.mockDataService.addUser({
+      this.userService.registerUser({
         ...formValue,
         avatarUrl: null,
         active: true,
+        createdAt: new Date(),
+      }).subscribe(() => {
+        this.loadData();
+        this.dialog.closeAll();
       });
     }
-
-    this.loadData();
-    this.dialog.closeAll();
   }
 
   toggleStatus(userId: string): void {
-    this.mockDataService.toggleUserStatus(userId);
-    this.loadData();
+    const user = this.users().find((u) => u.id === userId);
+    if (user) {
+      this.userService.bloqueadorUsuario(user.enrollment, user.active).subscribe(() => {
+        this.loadData();
+      });
+    }
   }
 }

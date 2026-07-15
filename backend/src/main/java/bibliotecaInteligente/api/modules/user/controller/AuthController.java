@@ -1,6 +1,7 @@
 package bibliotecaInteligente.api.modules.user.controller;
 
 import bibliotecaInteligente.api.modules.user.dto.UserDto;
+import bibliotecaInteligente.api.modules.user.model.User;
 import bibliotecaInteligente.api.modules.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -13,14 +14,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
+import java.util.List;
 
 @Tag(
         name = "Autenticação",
@@ -50,6 +50,7 @@ public class AuthController {
         return ResponseEntity.ok("Usuario cadastrado com sucesso!");
     }
 
+
     @Operation(
             summary = "Autenticar usuário",
             description = """
@@ -71,6 +72,7 @@ public class AuthController {
 
             SecurityContext context = SecurityContextHolder.getContext();
             context.setAuthentication(authentication);
+            request.getSession(true).setAttribute("SPRING_SECURITY_CONTEXT", context);
 
             return ResponseEntity.ok("login realizado com sucesso! Cookie de sessao gerado.");
 
@@ -78,6 +80,28 @@ public class AuthController {
             return ResponseEntity.status(401).body("Credenciais Invalidas.");
         }
     }
+    @GetMapping("/listar")
+    public ResponseEntity<List<User>> listarUsuarios() {
+        return ResponseEntity.ok(userService.listarUsuarios());
+    }
+    @PutMapping("/{cpf}")
+    public ResponseEntity<Void> atualizarUsuario(
+            @PathVariable String cpf,
+            @RequestBody UserDto dto) {
+
+        userService.atualizarUserPorCpf(cpf, dto);
+        return ResponseEntity.ok().build();
+    }
+    @PatchMapping("/{cpf}/bloquear")
+    public ResponseEntity<Void> bloquearUsuario(@PathVariable String cpf) {
+        userService.bloquearUsuario(cpf);
+        return ResponseEntity.ok().build();
+    }
+    @PatchMapping("/{cpf}/desbloquear")
+    public ResponseEntity<Void> desbloquearUsuario(@PathVariable String cpf) {
+        userService.desbloquearUsuario(cpf);
+        return ResponseEntity.ok().build();
+}
 
     @Operation(
             summary = "Encerrar sessão",

@@ -1,32 +1,32 @@
 <div class="loan-list animate-fade-in">
   <div class="loan-list__header">
     <div>
-      <h1 class="page-title">Empréstimos</h1>
-      <p class="page-subtitle">Gerenciamento e controle de empréstimos de livros</p>
+      <h1 class="page-title">{{ translationService.translate('loans') }}</h1>
+      <p class="page-subtitle">{{ translationService.translate('loans_subtitle') }}</p>
     </div>
     @if (authService.isAdmin()) {
       <button mat-flat-button color="primary" (click)="openNewLoan(newLoanTemplate)">
         <mat-icon>swap_horiz</mat-icon>
-        Novo Empréstimo
+        {{ translationService.translate('new_loan') }}
       </button>
     }
   </div>
 
   <div class="loan-list__filters">
     <mat-form-field appearance="outline" class="loan-list__search">
-      <mat-label>{{ authService.isAdmin() ? 'Buscar por livro ou usuário' : 'Buscar por livro' }}</mat-label>
-      <input matInput [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" [placeholder]="authService.isAdmin() ? 'Digite para buscar...' : 'Buscar por livro...'">
+      <mat-label>{{ authService.isAdmin() ? translationService.translate('search_book_user') : translationService.translate('search_book') }}</mat-label>
+      <input matInput [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" [placeholder]="authService.isAdmin() ? translationService.translate('type_to_search') : translationService.translate('search_book_placeholder')">
       <mat-icon matSuffix>search</mat-icon>
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="loan-list__filter">
-      <mat-label>Filtrar por Status</mat-label>
+      <mat-label>{{ translationService.translate('filter_status') }}</mat-label>
       <mat-select [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event)">
-        <mat-option value="ALL">Todos os status</mat-option>
-        <mat-option value="ACTIVE">Ativos</mat-option>
-        <mat-option value="RETURNED">Devolvidos</mat-option>
-        <mat-option value="OVERDUE">Atrasados</mat-option>
-        <mat-option value="RESERVED">Reservados</mat-option>
+        <mat-option value="ALL">{{ translationService.translate('all_status') }}</mat-option>
+        <mat-option value="ACTIVE">{{ translationService.translate('active') }}</mat-option>
+        <mat-option value="RETURNED">{{ translationService.translate('returned') }}</mat-option>
+        <mat-option value="OVERDUE">{{ translationService.translate('overdue') }}</mat-option>
+        <mat-option value="RESERVED">{{ translationService.translate('reserved') }}</mat-option>
       </mat-select>
     </mat-form-field>
   </div>
@@ -34,38 +34,54 @@
   <div class="card">
     <table mat-table [dataSource]="filteredLoans()" class="loan-list__table">
       <ng-container matColumnDef="bookTitle">
-        <th mat-header-cell *matHeaderCellDef>Livro</th>
+        <th mat-header-cell *matHeaderCellDef>{{ translationService.translate('book') }}</th>
         <td mat-cell *matCellDef="let loan" class="loan-list__book-title">{{ loan.bookTitle }}</td>
       </ng-container>
 
       <ng-container matColumnDef="userName">
-        <th mat-header-cell *matHeaderCellDef>Usuário</th>
+        <th mat-header-cell *matHeaderCellDef>{{ translationService.translate('user') }}</th>
         <td mat-cell *matCellDef="let loan">{{ loan.userName }}</td>
       </ng-container>
 
       <ng-container matColumnDef="loanDate">
-        <th mat-header-cell *matHeaderCellDef>Data Empréstimo</th>
+        <th mat-header-cell *matHeaderCellDef>{{ translationService.translate('loan_date') }}</th>
         <td mat-cell *matCellDef="let loan">{{ loan.loanDate | date:'dd/MM/yyyy' }}</td>
       </ng-container>
 
       <ng-container matColumnDef="dueDate">
-        <th mat-header-cell *matHeaderCellDef>Data Devolução</th>
+        <th mat-header-cell *matHeaderCellDef>{{ translationService.translate('due_date') }}</th>
         <td mat-cell *matCellDef="let loan">{{ loan.dueDate | date:'dd/MM/yyyy' }}</td>
       </ng-container>
 
       <ng-container matColumnDef="returnDate">
-        <th mat-header-cell *matHeaderCellDef>Data Efetiva</th>
+        <th mat-header-cell *matHeaderCellDef>{{ translationService.translate('effective_date') }}</th>
         <td mat-cell *matCellDef="let loan">
           {{ loan.returnDate ? (loan.returnDate | date:'dd/MM/yyyy') : '-' }}
         </td>
       </ng-container>
 
       <ng-container matColumnDef="status">
-        <th mat-header-cell *matHeaderCellDef>Status</th>
+        <th mat-header-cell *matHeaderCellDef>{{ translationService.translate('status') }}</th>
         <td mat-cell *matCellDef="let loan">
           <span class="status-badge" [class]="getStatusClass(loan.status)">
             {{ statusLabels[loan.status] }}
           </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>{{ translationService.translate('actions') }}</th>
+        <td mat-cell *matCellDef="let loan">
+          @if (loan.status === 'ACTIVE' || loan.status === 'OVERDUE') {
+            <button mat-icon-button color="accent" (click)="$event.stopPropagation(); renew(loan.id)">
+              <mat-icon>autorenew</mat-icon>
+            </button>
+            <button mat-icon-button color="primary" (click)="$event.stopPropagation(); returnLoan(loan.id)">
+              <mat-icon>assignment_returned</mat-icon>
+            </button>
+          } @else {
+            -
+          }
         </td>
       </ng-container>
 
@@ -76,7 +92,7 @@
     @if (filteredLoans().length === 0) {
       <div class="loan-list__empty">
         <mat-icon>info</mat-icon>
-        <p>Nenhum empréstimo encontrado com os filtros selecionados.</p>
+        <p>{{ translationService.translate('no_loans_found_filters') }}</p>
       </div>
     }
   </div>
@@ -86,9 +102,9 @@
   @if (selectedLoan(); as loan) {
     <div class="loan-detail-dialog">
       <div class="loan-detail-dialog__header">
-        <h2 mat-dialog-title class="loan-detail-dialog__title">
+        <h2 mat-dialog-title class="loan-dialog-title" style="color: var(--color-text-primary) !important;">
           <mat-icon>swap_horiz</mat-icon>
-          Detalhes do Empréstimo
+          {{ translationService.translate('loan_details') }}
         </h2>
         <button mat-icon-button mat-dialog-close aria-label="Fechar">
           <mat-icon>close</mat-icon>
@@ -98,7 +114,7 @@
       <mat-dialog-content class="loan-detail-dialog__content">
         <div class="loan-detail-dialog__meta">
           <div class="loan-detail-dialog__id">
-            <span class="label">Código do Empréstimo</span>
+            <span class="label">{{ translationService.translate('loan_code') }}</span>
             <span class="value code">{{ loan.id }}</span>
           </div>
           <span class="status-badge" [class]="getStatusClass(loan.status)">
@@ -111,15 +127,15 @@
         <div class="loan-detail-dialog__section">
           <div class="loan-detail-dialog__section-header">
             <mat-icon>menu_book</mat-icon>
-            <h3>Dados do Livro</h3>
+            <h3>{{ translationService.translate('book_data') }}</h3>
           </div>
           <div class="loan-detail-dialog__grid">
             <div class="loan-detail-dialog__field full">
-              <span class="label">Título</span>
+              <span class="label">{{ translationService.translate('title') }}</span>
               <span class="value text-primary font-medium">{{ loan.bookTitle }}</span>
             </div>
             <div class="loan-detail-dialog__field">
-              <span class="label">ID do Livro</span>
+              <span class="label">{{ translationService.translate('book_id') }}</span>
               <span class="value code">{{ loan.bookId }}</span>
             </div>
           </div>
@@ -130,15 +146,15 @@
         <div class="loan-detail-dialog__section">
           <div class="loan-detail-dialog__section-header">
             <mat-icon>person</mat-icon>
-            <h3>Dados do Membro</h3>
+            <h3>{{ translationService.translate('member_data') }}</h3>
           </div>
           <div class="loan-detail-dialog__grid">
             <div class="loan-detail-dialog__field full">
-              <span class="label">Nome Completo</span>
+              <span class="label">{{ translationService.translate('name') }}</span>
               <span class="value text-primary font-medium">{{ loan.userName }}</span>
             </div>
             <div class="loan-detail-dialog__field">
-              <span class="label">ID do Usuário</span>
+              <span class="label">{{ translationService.translate('user_id') }}</span>
               <span class="value code">{{ loan.userId }}</span>
             </div>
           </div>
@@ -149,25 +165,25 @@
         <div class="loan-detail-dialog__section">
           <div class="loan-detail-dialog__section-header">
             <mat-icon>info</mat-icon>
-            <h3>Detalhes da Operação</h3>
+            <h3>{{ translationService.translate('operation_details') }}</h3>
           </div>
           <div class="loan-detail-dialog__grid">
             <div class="loan-detail-dialog__field">
-              <span class="label">Data de Empréstimo</span>
+              <span class="label">{{ translationService.translate('loan_date') }}</span>
               <span class="value">{{ loan.loanDate | date:'dd/MM/yyyy' }}</span>
             </div>
             <div class="loan-detail-dialog__field">
-              <span class="label">Devolução Prevista</span>
+              <span class="label">{{ translationService.translate('due_date') }}</span>
               <span class="value">{{ loan.dueDate | date:'dd/MM/yyyy' }}</span>
             </div>
             <div class="loan-detail-dialog__field">
-              <span class="label">Data Efetiva de Devolução</span>
+              <span class="label">{{ translationService.translate('effective_return_date') }}</span>
               <span class="value" [class.text-muted]="!loan.returnDate">
-                {{ loan.returnDate ? (loan.returnDate | date:'dd/MM/yyyy') : 'Em aberto' }}
+                {{ loan.returnDate ? (loan.returnDate | date:'dd/MM/yyyy') : translationService.translate('open_status') }}
               </span>
             </div>
             <div class="loan-detail-dialog__field">
-              <span class="label">Aceito Por</span>
+              <span class="label">{{ translationService.translate('accepted_by') }}</span>
               <span class="value font-medium">{{ loan.acceptedBy }}</span>
             </div>
           </div>
@@ -177,13 +193,13 @@
       <mat-dialog-actions align="end" class="loan-detail-dialog__actions">
         @if (authService.isAdmin() && (loan.status === 'ACTIVE' || loan.status === 'OVERDUE')) {
           <button mat-flat-button color="accent" (click)="renew(loan.id)" type="button" style="margin-right: 8px;">
-            Renovar
+            {{ translationService.translate('renew') }}
           </button>
           <button mat-flat-button color="primary" (click)="returnLoan(loan.id)" type="button" style="margin-right: 8px;">
-            Devolver
+            {{ translationService.translate('return') }}
           </button>
         }
-        <button mat-button mat-dialog-close type="button">Fechar</button>
+        <button mat-button mat-dialog-close type="button">{{ translationService.translate('close') }}</button>
       </mat-dialog-actions>
     </div>
   }
@@ -192,9 +208,9 @@
 <ng-template #newLoanTemplate>
   <div class="loan-detail-dialog">
     <div class="loan-detail-dialog__header">
-      <h2 mat-dialog-title class="loan-detail-dialog__title">
+      <h2 mat-dialog-title class="loan-dialog-title" style="color: var(--color-text-primary) !important;">
         <mat-icon>swap_horiz</mat-icon>
-        Registrar Novo Empréstimo
+        {{ translationService.translate('register_new_loan') }}
       </h2>
       <button mat-icon-button mat-dialog-close aria-label="Fechar">
         <mat-icon>close</mat-icon>
@@ -205,52 +221,43 @@
       <mat-dialog-content class="loan-detail-dialog__content">
         <div class="loan-detail-dialog__section">
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Selecionar Livro</mat-label>
+            <mat-label>{{ translationService.translate('select_book') }}</mat-label>
             <mat-select formControlName="bookId">
               @for (book of books(); track book.id) {
                 <mat-option [value]="book.id">
-                  {{ book.title }} ({{ book.availableCopies }} disp.)
+                  {{ book.title }} ({{ book.availableCopies }} {{ translationService.translate('available_unit') }})
                 </mat-option>
               }
             </mat-select>
-            @if (newLoanForm.controls.bookId.touched && newLoanForm.controls.bookId.invalid) {
-              <mat-error>O livro é obrigatório.</mat-error>
-            }
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Selecionar Membro</mat-label>
+            <mat-label>{{ translationService.translate('select_member') }}</mat-label>
             <mat-select formControlName="userId">
               @for (user of users(); track user.id) {
                 <mat-option [value]="user.id">
-                  {{ user.name }} (Matrícula: {{ user.enrollment }})
+                  {{ user.name }} ({{ translationService.translate('enrollment') }}: {{ user.enrollment }})
                 </mat-option>
               }
             </mat-select>
-            @if (newLoanForm.controls.userId.touched && newLoanForm.controls.userId.invalid) {
-              <mat-error>O membro é obrigatório.</mat-error>
-            }
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Data Limite de Devolução</mat-label>
+            <mat-label>{{ translationService.translate('due_date_limit') }}</mat-label>
             <input matInput type="date" formControlName="dueDate">
-            @if (newLoanForm.controls.dueDate.touched && newLoanForm.controls.dueDate.invalid) {
-              <mat-error>A data limite é obrigatória.</mat-error>
-            }
           </mat-form-field>
 
           <div class="loan-detail-dialog__field" style="margin-top: 16px;">
-            <span class="label">Operador Responsável</span>
+            <span class="label">{{ translationService.translate('operator_responsible') }}</span>
             <span class="value font-medium">Gustavo de Lima (Admin)</span>
           </div>
         </div>
       </mat-dialog-content>
 
       <mat-dialog-actions align="end" class="loan-detail-dialog__actions">
-        <button mat-button mat-dialog-close type="button">Cancelar</button>
+        <button mat-button mat-dialog-close type="button">{{ translationService.translate('cancel') }}</button>
         <button mat-flat-button color="primary" type="submit" [disabled]="newLoanForm.invalid">
-          Confirmar Empréstimo
+          {{ translationService.translate('confirm_loan') }}
         </button>
       </mat-dialog-actions>
     </form>

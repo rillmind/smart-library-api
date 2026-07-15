@@ -2,6 +2,104 @@
 
 Registro de todas as alterações realizadas no projeto para controle interno e acompanhamento da equipe.
 
+## [2026-07-14] — Temas/Idiomas, Solicitação de Empréstimos, Auditoria Real e Correções Críticas de API
+
+### Adicionado
+- **Barra de Pesquisa Global Sincronizada (SearchService):**
+  - Desenvolvi o `SearchService` reativo no core que sincroniza instantaneamente a caixa de busca do Header com o feed do catálogo de livros. Se o leitor iniciar a pesquisa de outra rota, o sistema o redireciona automaticamente para o acervo (`/books`).
+- **Alternador de Menu Hambúrguer (SidebarService):**
+  - Desenvolvi o `SidebarService` para gerenciar o estado recolhido (collapse) da barra lateral quando o botão de menu da navbar superior for clicado, ocultando textos e centralizando ícones com transição suave.
+- **Navegação no Menu do Usuário do Header:**
+  - Vinculei os botões de "Meu Perfil" e "Configurações" no menu do Header aos `routerLink` correspondentes.
+- **Tradução Inteligente de Logs do Banco de Dados (Regex Parser):**
+  - Implementei um analisador reativo no `TranslationService` que intercepta as strings em português salvas pelo Spring Boot na tabela de auditoria e reconstrói as frases dinamicamente em tempo de execução na Timeline de Logs e no feed do Dashboard para Inglês e Espanhol.
+- **Internacionalização de Listagens e Formulários Administrativos:**
+  - Conectei e traduzi por completo o Portal de Login de homologação, as tabelas de Empréstimos e Usuários e os diálogos de detalhamento e de cadastro de novos livros/membros.
+- **Tradução de Categorias e Filiais de Bibliotecas:**
+  - Ajustei o processador estatístico do Dashboard para expor a chave bruta do enum da categoria, permitindo traduzir o gráfico de "Categorias Populares" e todos os dropdowns de bibliotecas/categorias de forma totalmente dinâmica e reativa.
+- **Suporte Dinâmico a Multi-Idiomas (Tradução Reativa):**
+  - Criei o serviço `TranslationService` no core para gerenciar chaves de tradução reativas (Português, Inglês e Espanhol) usando Signals do Angular 21, persistindo a preferência no LocalStorage do navegador.
+  - Conectei as traduções na Sidebar (menus e rodapé), no Header (dados e busca), na tela de Configurações (todos os campos e frequências), no Dashboard (painéis estatísticos, títulos, cabeçalho de tabelas e status) e na Gaveta de Catalogação de Livros (`book-form-drawer`).
+- **Tema Escuro Nativo no Design System (Angular Material Overrides):**
+  - Configurei a classe `.dark-theme` no `styles.scss` substituindo as variáveis CSS de cores por tonalidades e escalas escuras e limpas.
+  - Adicionei overrides de estilos específicos para forçar a renderização escura e com legibilidade e contraste premium em componentes do Angular Material no modo escuro, incluindo Cards, Tabelas, Dialogs, Inputs de Formulários Outlined e Selects.
+  - Integrei a seleção de temas na tela de Configurações, aplicando a classe ao elemento `html` em tempo real e persistindo no LocalStorage.
+- **Ação de Solicitar Empréstimo para Alunos:**
+  - Implementei o botão "Solicitar" nos cards de livros do Acervo (`/books`) disponível para alunos comuns (membros) quando houver cópias no banco, chamando o método `requestLoan()` que cria um empréstimo ativo no servidor e atualiza os totais.
+- **Módulo de Auditoria de Logs Persistido no Backend:**
+  - Criei a entidade JPA `AuditLog.java` no backend para salvar as ações administrativas do sistema na tabela `tb_audit_logs`.
+  - Criei o repositório `AuditLogRepository.java`, o serviço `AuditLogService.java` e o controlador REST `AuditLogController.java` exposto no endpoint `GET /api/logs`.
+  - Integrei o `AuditLogService` nos serviços existentes do Spring Boot (`UserService`, `BookService`, `EmprestimoService`) para registrar automaticamente as ações mais críticas do sistema (catalogação de livros, cadastro e bloqueio/desbloqueio de membros, e realização/renovação/devolução de empréstimos) com indicação do autor/operador.
+- **Tela de Auditoria de Logs no Frontend (Formato Timeline):**
+  - Desenvolvi a tela de Auditoria (`/audit`) em Angular 21, contendo uma **linha do tempo interativa e premium** de eventos em vez de tabela crua, exibindo ícones dinâmicos por tipo de ação, badges coloridos por operador e animações suaves.
+  - Criei o serviço de chamadas `audit.service.ts` integrado ao novo endpoint do backend.
+  - Registrei a nova rota `/audit` protegida com `adminGuard` e inseri o menu correspondente na Sidebar da aplicação para controle restrito de administradores.
+- **Interceptor Global de Erros de API:**
+  - Criei o interceptor funcional de requisições `error.interceptor.ts` para capturar falhas de requisições HTTP (status 400, 401, 500, etc.) em qualquer chamada ao servidor.
+  - Integrei a exibição de toasts de erros animados utilizando o `MatSnackBar` do Angular Material com uma folha de estilos personalizada (`.error-snackbar`) no arquivo global `styles.scss`, garantindo um feedback visual de alto contraste.
+  - Registrei o `errorInterceptor` na configuração geral do provedor HttpClient no `app.config.ts`.
+- **Ações de Devolução e Renovação de Empréstimos:**
+  - Criei os endpoints semânticos `@PatchMapping("/{id}/devolver")` e `@PatchMapping("/{id}/renovar")` no `EmprestimoController.java` e implementei a lógica de negócio correspondente no `EmprestimoService.java` (atualização automática de status e prazos de devolução no Postgres).
+  - Adicionei os botões de ação rápida de Devolver e Renovar diretamente na tabela de listagem de empréstimos ativos no frontend, chamando o `LoanService` com parada de propagação de eventos do mouse.
+
+### Alterado
+- **Remoção do Botão "New User" no Painel Administrativo:**
+  - Removi o botão de cadastro de novos membros do painel de gestão de usuários (`user-list.component.html`), já que o registro de novos alunos/professores é feito exclusivamente pela tela de login/registro e não faz sentido o administrador criar contas manualmente.
+- **Mapeamento de Dados no PUT de Livros (BookService):**
+  - Corrigi o `mapToBackend()` para enviar apenas `{ titulo, autor, descricao }` no body do PUT (sem `id`, `posse` ou `livros`), já que o `id` vai na URL e os campos de relacionamento (`posse`, `livros`) não devem ser enviados pelo frontend — o `LivroService.atualizarLivroPorId` do Spring Boot fazia `.build()` sem esses campos, causando o erro 500.
+- **Feedback de Erro com Snackbar no CRUD de Livros:**
+  - Adicionei tratamento de erro com `MatSnackBar` no `onSave()` do drawer de livros e no `deleteBook()` da listagem, para exibir mensagens claras de falha ao invés de falhas silenciosas ou toasts genéricos do interceptor.
+- **Edição de Perfil de Usuário com Chamadas Reais:**
+  - Implementei um modal interativo de alteração de dados no `UserProfileComponent` para permitir que o usuário logado edite seu Nome, E-mail e Senha no sistema.
+  - Integrei o formulário reativo de edição ao método `updateUser` do `UserService` no Angular, refletindo os dados editados em tempo real no `AuthService` com atualização imediata do avatar e menu global.
+  - Atualizei a DTO de persistência de usuários no `UserService` e no cadastro no frontend para enviar também o parâmetro `nome` de forma consistente com os validadores de request do Spring Boot.
+
+### Corrigido
+- **Reavaliação de Signals Angular (Clonagem de Referências):**
+  - Corrigi o comportamento de atualização de dados nos templates no modo mock. Como passamos a expor a referência do array real do `MockDataService` (para permitir persistência), a alteração de itens no array preservava a mesma referência de memória do objeto, fazendo com que o Angular Signal (`set`) achasse que o valor não havia mudado. Ajustei os métodos `loadBooks()` (livros), `loadData()` (usuários/bibliotecas) e `loadData()` (empréstimos) para definirem os Signals criando cópias clonadas (`[...lista]`), disparando a renderização na hora.
+- **Atualização do Acervo após Edição de Livros:**
+  - Corrigi o binding de evento de salvamento do formulário de livros no template `book-list.component.html`. O seletor `<app-book-form-drawer>` estava emitindo o output `bookSaved`, mas a listagem de livros tentava escutar `(saved)="onBookSaved()"`. Corrigindo para `(bookSaved)="onBookSaved()"`, o acervo é recarregado dinamicamente com as alterações salvas.
+- **Falha de Persistência no Modo Mock (MockDataService):**
+  - Corrigi a recuperação de dados das entidades para expor a referência real em memória do array interno do `MockDataService` ao invés de cópias estruturais desvinculadas (`[...]`). Isso resolveu o problema de a edição e cadastro de livros, usuários e empréstimos não persistirem localmente em tempo de execução.
+- **Legibilidade de Badges de Operador no Modo Escuro:**
+  - Corrigi a definição de classes em `audit-list.component.scss` para que o texto do badge do administrador herde `var(--color-primary)`, solucionando o baixo contraste visual (texto azul escuro sobre fundo azul escuro) no tema escuro.
+- **Erro de Desserialização de Empréstimo (400 Bad Request):**
+  - Mudei a propriedade `bloqueado` de `User.java` no backend de tipo primitivo `boolean` para o wrapper classe `Boolean`. Isso evita falhas de parse do Jackson quando o frontend envia apenas o CPF de usuários em relacionamentos de empréstimo (que deixavam o campo nulo no mapeamento de tipo primitivo).
+  - Corrigi o `EmprestimoService.java` para buscar entidades reais de `User` e `Livro` no Postgres antes de realizar a associação e salvar o empréstimo.
+- **Falha de Cadastro de Membro sem Senha (500 Internal Error):**
+  - Ajustei o backend (`UserService.java`) para associar o CPF como senha padrão provisória de acesso caso o Administrador realize o cadastro de novos membros sem senha informada no DTO.
+  - Renomeei o input de cadastro de "Matrícula" para "CPF (11 números)" no frontend com máscara de validação no Angular para evitar rejeições do Hibernate.
+  - Corrigi o update de usuários no Angular para manter a busca no banco pelo CPF original (`editingUserId`) e não o alterado no form.
+- **Visual Esmagado do Botão "Solicitar":**
+  - Adicionei regras de estilo específicas para botões `[mat-flat-button]` dentro do card de livros no `book-list.component.scss`, corrigindo o conflito que esmagava o botão em caixas de 32px.
+- **Travamentos Silenciosos na Busca de Livros:**
+  - Ajustei a lógica de filtro de string em `book-list.component.ts` para verificar de forma segura e nula todas as propriedades (`title`, `author`, `isbn`) antes de chamar `.toLowerCase()`.
+- **Persistência de Data de Devolução no Backend:**
+  - Corrigi o bug de copiar e colar na linha 38 do `EmprestimoService.java` do backend, que salvava a data de devolução modificada na propriedade `data_emprestimo` ao invés de atualizar o campo `data_devolucao` da entidade.
+
+## [2026-07-08] — Integração com a API Real e Configuração do CORS
+
+### Adicionado
+- **Configuração de API Dinâmica:**
+  - Criei o arquivo [api.config.ts](file:///c:/Users/Guga/Documents/Biblioteca/frontend/src/app/core/config/api.config.ts) para centralizar a URL do backend e a chave `USE_MOCK`, permitindo chavear facilmente entre os dados mockados locais e a API do Spring Boot.
+  - Desenvolvi o [credentials.interceptor.ts](file:///c:/Users/Guga/Documents/Biblioteca/frontend/src/app/core/interceptors/credentials.interceptor.ts) para adicionar automaticamente a propriedade `withCredentials: true` em todas as requisições enviadas ao backend, viabilizando o fluxo de autenticação por cookies de sessão (`JSESSIONID`).
+- **Serviços HTTP de Integração:**
+  - Criei o [book.service.ts](file:///c:/Users/Guga/Documents/Biblioteca/frontend/src/app/core/services/book.service.ts) para gerenciamento assíncrono do catálogo de livros no backend, incluindo o mapeamento bidirecional de dados para compatibilidade com o formato simplificado da API.
+  - Criei o [loan.service.ts](file:///c:/Users/Guga/Documents/Biblioteca/frontend/src/app/core/services/loan.service.ts) para registrar, listar e gerenciar o ciclo de vida dos empréstimos em comunicação com a API.
+  - Criei o [user.service.ts](file:///c:/Users/Guga/Documents/Biblioteca/frontend/src/app/core/services/user.service.ts) para cadastro, listagem, atualização e controle de bloqueio de membros integrando com os novos endpoints da API na branch `dev`.
+
+### Alterado
+- **Autenticação Real:**
+  - Adaptei o [auth.service.ts](file:///c:/Users/Guga/Documents/Biblioteca/frontend/src/app/core/services/auth.service.ts) para realizar chamadas reais de login, registro e logout na API do Spring Boot. Adicionei um fluxo inteligente de auto-cadastro na nuvem caso o usuário administrativo ou membro de homologação ainda não existam no banco de dados.
+- **Componentes do Frontend:**
+  - Registrei o `provideHttpClient` com o interceptor de credenciais no [app.config.ts](file:///c:/Users/Guga/Documents/Biblioteca/frontend/src/app/app.config.ts).
+  - Adaptei o [book-list.component.ts](file:///c:/Users/Guga/Documents/Biblioteca/frontend/src/app/features/books/pages/book-list/book-list.component.ts) e o [book-form-drawer.component.ts](file:///c:/Users/Guga/Documents/Biblioteca/frontend/src/app/features/books/components/book-form-drawer/book-form-drawer.component.ts) para carregar e persistir as ações do catálogo por meio do `BookService` de forma assíncrona.
+  - Adaptei a listagem de empréstimos [loan-list.component.ts](file:///c:/Users/Guga/Documents/Biblioteca/frontend/src/app/features/loans/pages/loan-list/loan-list.component.ts) para ler as listagens de livros, membros e empréstimos das chamadas HTTP, removendo o construtor antigo e migrando as ações de devolução e renovação de empréstimos para atualizações da API.
+  - Adaptei o gerenciamento de membros [user-list.component.ts](file:///c:/Users/Guga/Documents/Biblioteca/frontend/src/app/features/users/pages/user-list/user-list.component.ts) para listar, cadastrar, editar e aplicar o bloqueio de membros integrando com o `UserService`.
+  - Adaptei o painel principal [dashboard-home.component.ts](file:///c:/Users/Guga/Documents/Biblioteca/frontend/src/app/features/dashboard/pages/dashboard-home/dashboard-home.component.ts) para computar de forma reativa os totais, feeds e gráficos a partir dos dados do banco real, removendo as leituras estáticas.
+- **Modelagem de Dados:**
+  - Tornei opcional o campo `acceptedBy` no modelo [loan.model.ts](file:///c:/Users/Guga/Documents/Biblioteca/frontend/src/app/core/models/loan.model.ts) para garantir a compilação do TypeScript, uma vez que a API do backend não gerencia essa informação.
+
 ## [2026-06-22] — Reestruturação do Monorepo
 
 ### Adicionado

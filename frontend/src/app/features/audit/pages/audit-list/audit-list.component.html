@@ -1,0 +1,45 @@
+<div class="audit-list animate-fade-in">
+  <div class="audit-list__header">
+    <div>
+      <h1 class="page-title">{{ translationService.translate('audit') }}</h1>
+      <p class="page-subtitle">{{ translationService.translate('audit_subtitle') }}</p>
+    </div>
+  </div>
+
+  <div class="audit-list__filters">
+    <mat-form-field appearance="outline" class="audit-list__search">
+      <mat-label>{{ translationService.translate('filter_logs_placeholder') }}</mat-label>
+      <input matInput [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" [placeholder]="translationService.translate('type_to_filter')">
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+  </div>
+
+  <div class="timeline">
+    @for (log of filteredLogs(); track log.id) {
+      <div class="timeline__item">
+        <div class="timeline__badge">
+          <mat-icon>{{ getLogIcon(log.acao) }}</mat-icon>
+        </div>
+        <div class="timeline__card card">
+          <div class="timeline__card-header">
+            <span class="timeline__timestamp">
+              <mat-icon>schedule</mat-icon>
+              {{ log.timestamp | date:'dd/MM/yyyy HH:mm:ss' }}
+            </span>
+            <span class="operator-badge" [class]="getOperatorClass(log.autor)">
+              {{ translationService.translate(log.autor) }}
+            </span>
+          </div>
+          <div class="timeline__card-body">
+            <p class="timeline__message">{{ translationService.translateLog(log.acao) }}</p>
+          </div>
+        </div>
+      </div>
+    } @empty {
+      <div class="audit-list__empty">
+        <mat-icon>history_toggle_off</mat-icon>
+        <p>{{ translationService.translate('no_audit_logs') }}</p>
+      </div>
+    }
+  </div>
+</div>

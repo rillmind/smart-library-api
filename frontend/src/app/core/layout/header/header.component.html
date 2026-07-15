@@ -1,6 +1,6 @@
 <mat-toolbar class="header">
   <div class="header__left">
-    <button mat-icon-button class="header__menu-btn" aria-label="Menu">
+    <button mat-icon-button class="header__menu-btn" aria-label="Menu" (click)="toggleSidebar()">
       <mat-icon>menu</mat-icon>
     </button>
     <div class="header__logo">
@@ -15,7 +15,9 @@
       <input
         type="text"
         class="header__search-input"
-        placeholder="Buscar livros, autores, ISBN..."
+        [ngModel]="searchService.searchQuery()"
+        (ngModelChange)="onSearchChange($event)"
+        [placeholder]="translationService.translate('search_placeholder')"
       />
     </div>
   </div>
@@ -37,18 +39,18 @@
         <div style="font-size: var(--font-size-xs); color: var(--color-text-secondary); margin-top: 2px;">{{ authService.currentUser()?.email }}</div>
       </div>
       <mat-divider></mat-divider>
-      <button mat-menu-item>
+      <button mat-menu-item routerLink="/users/profile">
         <mat-icon>person</mat-icon>
-        <span>Meu Perfil</span>
+        <span>{{ translationService.translate('my_profile') }}</span>
       </button>
-      <button mat-menu-item>
+      <button mat-menu-item routerLink="/settings">
         <mat-icon>settings</mat-icon>
-        <span>Configurações</span>
+        <span>{{ translationService.translate('settings') }}</span>
       </button>
       <mat-divider></mat-divider>
       <button mat-menu-item (click)="logout()">
         <mat-icon>logout</mat-icon>
-        <span>Sair</span>
+        <span>{{ translationService.translate('logout') }}</span>
       </button>
     </mat-menu>
   </div>

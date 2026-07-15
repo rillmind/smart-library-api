@@ -1,5 +1,5 @@
 <app-header />
 <app-sidebar />
-<main class="main-content">
+<main class="main-content" [class.main-content--collapsed]="sidebarService.isCollapsed()">
   <router-outlet />
 </main>

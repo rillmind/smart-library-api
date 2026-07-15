@@ -202,11 +202,11 @@ export class MockDataService {
   ];
 
   getLibraries(): Library[] {
-    return [...this.libraries];
+    return this.libraries;
   }
 
   getUsers(): User[] {
-    return [...this.users];
+    return this.users;
   }
 
   getUserById(id: string): User | undefined {
@@ -214,7 +214,7 @@ export class MockDataService {
   }
 
   getBooks(): Book[] {
-    return [...this.books];
+    return this.books;
   }
 
   getBookById(id: string): Book | undefined {
@@ -226,7 +226,7 @@ export class MockDataService {
   }
 
   getLogs(): { action: string; timestamp: Date }[] {
-    return [...this.logs];
+    return this.logs;
   }
 
   addBook(book: Omit<Book, 'id'>): Book {

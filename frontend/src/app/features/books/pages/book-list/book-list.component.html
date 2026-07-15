@@ -1,13 +1,13 @@
 <div class="books animate-fade-in">
   <div class="books__header">
     <div>
-      <h1 class="page-title">Livros</h1>
-      <p class="page-subtitle">Acervo completo da biblioteca</p>
+      <h1 class="page-title">{{ translationService.translate('books') }}</h1>
+      <p class="page-subtitle">{{ translationService.translate('books_subtitle') }}</p>
     </div>
     @if (authService.isAdmin()) {
       <button mat-flat-button color="primary" class="books__add-btn" (click)="openDrawer()">
         <mat-icon>add</mat-icon>
-        Novo Livro
+        {{ translationService.translate('new_book') }}
       </button>
     }
   </div>
@@ -17,9 +17,9 @@
     <input
       type="text"
       class="books__search-input"
-      placeholder="Buscar por título, autor ou ISBN..."
-      [ngModel]="searchQuery()"
-      (ngModelChange)="onSearch($event)"
+      [placeholder]="translationService.translate('search_placeholder')"
+      [ngModel]="searchService.searchQuery()"
+      (ngModelChange)="searchService.searchQuery.set($event)"
     />
   </div>
 
@@ -34,7 +34,7 @@
           <p class="book-card__author">{{ book.author }}</p>
           <div class="book-card__meta">
             <span class="book-card__category">
-              {{ categoryLabels[book.category] }}
+              {{ translationService.translate(book.category) }}
             </span>
             <span class="book-card__year">{{ book.year }}</span>
           </div>
@@ -44,9 +44,9 @@
               [class]="book.availableCopies > 0 ? 'status-badge--available' : 'status-badge--unavailable'"
             >
               @if (book.availableCopies > 0) {
-                {{ book.availableCopies }} disponível(is)
+                {{ book.availableCopies }} {{ translationService.translate('available_units') }}
               } @else {
-                Indisponível
+                {{ translationService.translate('unavailable') }}
               }
             </span>
             @if (authService.isAdmin()) {
@@ -58,14 +58,25 @@
                   <mat-icon>delete</mat-icon>
                 </button>
               </div>
+            } @else {
+              <button
+                mat-flat-button
+                color="primary"
+                [disabled]="book.availableCopies === 0"
+                (click)="requestLoan(book)"
+                type="button"
+                style="height: 36px; padding: 0 16px; min-width: 90px; line-height: 36px;"
+              >
+                {{ translationService.translate('request') }}
+              </button>
             }
           </div>
         </div>
       </div>
     } @empty {
       <div class="books__empty">
-        <mat-icon>search_off</mat-icon>
-        <p>Nenhum livro encontrado.</p>
+        <mat-icon>info</mat-icon>
+        <p>{{ translationService.translate('no_books_found') }}</p>
       </div>
     }
   </div>

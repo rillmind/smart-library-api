@@ -1,18 +1,17 @@
 <div class="login-page">
   <div class="login-container animate-fade-in">
-    
     <div class="login__branding">
       <div class="login__logo">
         <mat-icon class="login__logo-icon">local_library</mat-icon>
       </div>
       <h1 class="login__title">Smart Library</h1>
-      <p class="login__subtitle">Plataforma Inteligente de Biblioteca</p>
+      <p class="login__subtitle">{{ translationService.translate('login_platform_subtitle') }}</p>
     </div>
 
     <mat-card class="login__card">
       <mat-card-content>
-        <h2 class="login__card-title">Portal de Acesso</h2>
-        <p class="login__card-subtitle">Ambiente temporário de homologação. Escolha um perfil para entrar:</p>
+        <h2 class="login__card-title">{{ translationService.translate('login_portal_title') }}</h2>
+        <p class="login__card-subtitle">{{ translationService.translate('login_portal_subtitle') }}</p>
 
         <div class="login__quick-access">
           <button type="button" class="login__role-card login__role-card--admin" (click)="loginAdmin()">
@@ -20,8 +19,8 @@
               <mat-icon>admin_panel_settings</mat-icon>
             </div>
             <div class="login__role-info">
-              <h3>Entrar como Administrador</h3>
-              <p>Gerencie o acervo de livros, registre e devolda empréstimos, controle membros e audite logs.</p>
+              <h3>{{ translationService.translate('login_admin_title') }}</h3>
+              <p>{{ translationService.translate('login_admin_subtitle') }}</p>
             </div>
             <mat-icon class="login__role-arrow">chevron_right</mat-icon>
           </button>
@@ -31,8 +30,8 @@
               <mat-icon>account_circle</mat-icon>
             </div>
             <div class="login__role-info">
-              <h3>Entrar como Membro</h3>
-              <p>Visualize o catálogo de livros disponíveis, consulte seus empréstimos ativos e veja seu perfil.</p>
+              <h3>{{ translationService.translate('login_user_title') }}</h3>
+              <p>{{ translationService.translate('login_user_subtitle') }}</p>
             </div>
             <mat-icon class="login__role-arrow">chevron_right</mat-icon>
           </button>
@@ -41,7 +40,7 @@
     </mat-card>
 
     <p class="login__footer">
-      © 2026 Smart Library — Protótipo de Homologação
+      {{ translationService.translate('login_footer') }}
     </p>
   </div>
 </div>

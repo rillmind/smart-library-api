@@ -103,4 +103,32 @@
     font-size: var(--font-size-xs);
     color: var(--color-text-secondary);
   }
+
+  &--collapsed {
+    width: var(--sidebar-collapsed-width);
+
+    .sidebar__section-title {
+      display: none;
+    }
+
+    .sidebar__item-label {
+      display: none;
+    }
+
+    .sidebar__library-info {
+      justify-content: center;
+      padding: var(--spacing-xs);
+      
+      div {
+        display: none;
+      }
+    }
+
+    .sidebar__item {
+      justify-content: center;
+      padding: var(--spacing-sm) 0;
+      gap: 0;
+      margin: 2px var(--spacing-xs);
+    }
+  }
 }

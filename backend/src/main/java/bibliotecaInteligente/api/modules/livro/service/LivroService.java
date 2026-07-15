@@ -1,39 +1,79 @@
 package bibliotecaInteligente.api.modules.livro.service;
 
+import bibliotecaInteligente.api.modules.emprestimo.repository.EmprestimoRpository;
 import bibliotecaInteligente.api.modules.livro.model.Livro;
 import bibliotecaInteligente.api.modules.livro.repository.LivroRpository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class LivroService {
-    private final LivroRpository livroRpository;
+    private final LivroRpository livroRepository;
+    private final EmprestimoRpository emprestimoRepository;
 
-    public LivroService(LivroRpository livroRpository) {
-        this.livroRpository = livroRpository;
+    @org.springframework.beans.factory.annotation.Autowired
+    private bibliotecaInteligente.api.modules.user.service.AuditLogService auditLogService;
+
+    public LivroService(LivroRpository livroRpository, EmprestimoRpository emprestimoRpository) {
+        this.livroRepository = livroRpository;
+        this.emprestimoRepository = emprestimoRpository;
     }
 
     public void salvarLivro(Livro livro) {
-        livroRpository.save(livro);
+        livroRepository.save(livro);
+        auditLogService.registrarLog("Livro catalogado: " + livro.getTitulo() + " (Autor: " + livro.getAutor() + ")", "Administrador");
     }
+
+    public List<Livro> listarLivros() {
+        return livroRepository.findAll();
+    }
+
     public Livro buscarLivroPorId(Integer id) {
-        return livroRpository.findById(id).orElseThrow(
+        return livroRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Id não encontrado!")
         );
     }
+
+    @Transactional
     public void deletarLivroPorId(Integer id) {
-        livroRpository.deleteById(id);
+        Livro livro = buscarLivroPorId(id);
+        List<bibliotecaInteligente.api.modules.emprestimo.model.Emprestimo> emprestimos = emprestimoRepository.findAll()
+                .stream()
+                .filter(e -> e.getId_livro() != null && e.getId_livro().getId().equals(id))
+                .toList();
+
+        for (bibliotecaInteligente.api.modules.emprestimo.model.Emprestimo emp : emprestimos) {
+            emp.setId_livro(null);
+            emprestimoRepository.save(emp);
+        }
+
+        if (livro.getPosse() != null) {
+            livro.setPosse(null);
+            livroRepository.saveAndFlush(livro);
+        }
+
+        livroRepository.deleteById(id);
+        auditLogService.registrarLog("Livro removido: " + livro.getTitulo() + " (ID: " + id + ")", "Administrador");
     }
+
+    @Transactional
     public void atualizarLivroPorId(Integer id, Livro livro) {
-        Livro livroEntity = livroRpository.findById(id).orElseThrow(() ->
+        Livro livroEntity = livroRepository.findById(id).orElseThrow(() ->
                 new RuntimeException("Livro não encontrado!"));
 
-        Livro livroAtualizado = Livro.builder()
-                .id(livroEntity.getId())
-                .titulo(livro.getTitulo() != null ? livro.getTitulo() : livroEntity.getTitulo())
-                .autor(livro.getAutor() != null ? livro.getAutor() : livroEntity.getAutor())
-                .descricao(livro.getDescricao() != null ? livro.getDescricao() : livroEntity.getDescricao())
-                .build();
+        if (livro.getTitulo() != null) {
+            livroEntity.setTitulo(livro.getTitulo());
+        }
+        if (livro.getAutor() != null) {
+            livroEntity.setAutor(livro.getAutor());
+        }
+        if (livro.getDescricao() != null) {
+            livroEntity.setDescricao(livro.getDescricao());
+        }
 
-        livroRpository.saveAndFlush(livroAtualizado);
+        livroRepository.saveAndFlush(livroEntity);
+        auditLogService.registrarLog("Livro atualizado: " + livroEntity.getTitulo() + " (ID: " + id + ")", "Administrador");
     }
 }

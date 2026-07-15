@@ -1,6 +1,6 @@
 <div class="settings animate-fade-in">
   <div class="settings__header">
-    <h1 class="page-title">Configurações</h1>
+    <h1 class="page-title">{{ translationService.translate('settings') }}</h1>
     <p class="page-subtitle">Personalize a sua experiência no Smart Library</p>
   </div>
 
@@ -15,18 +15,19 @@
             </h2>
             <div class="settings__grid">
               <mat-form-field appearance="outline">
-                <mat-label>Tema do Painel</mat-label>
+                <mat-label>{{ translationService.translate('theme') }}</mat-label>
                 <mat-select formControlName="theme">
-                  <mat-option value="light">Tema Claro</mat-option>
-                  <mat-option value="dark">Tema Escuro</mat-option>
+                  <mat-option value="light">{{ translationService.translate('theme_light') }}</mat-option>
+                  <mat-option value="dark">{{ translationService.translate('theme_dark') }}</mat-option>
                 </mat-select>
               </mat-form-field>
 
               <mat-form-field appearance="outline">
-                <mat-label>Idioma Padrão</mat-label>
+                <mat-label>{{ translationService.translate('language') }}</mat-label>
                 <mat-select formControlName="language">
                   <mat-option value="pt-BR">Português (Brasil)</mat-option>
-                  <mat-option value="en-US">English (United States)</mat-option>
+                  <mat-option value="en">English (United States)</mat-option>
+                  <mat-option value="es">Español (España)</mat-option>
                 </mat-select>
               </mat-form-field>
             </div>
@@ -37,30 +38,31 @@
           <div class="settings__section">
             <h2 class="settings__section-title">
               <mat-icon>notifications</mat-icon>
-              Notificações
+              {{ translationService.translate('notifications') }}
             </h2>
             <div class="settings__checkbox-list">
               <mat-checkbox formControlName="emailNotifications" color="primary">
-                Receber notificações por e-mail sobre novas movimentações
+                {{ translationService.translate('email_notif') }}
               </mat-checkbox>
 
               <mat-checkbox formControlName="dueAlerts" color="primary">
-                Alertar-me sobre devoluções próximas do prazo de vencimento
+                {{ translationService.translate('due_notif') }}
               </mat-checkbox>
             </div>
 
             <mat-form-field appearance="outline" class="settings__frequency" style="margin-top: 16px;">
-              <mat-label>Frequência de Alertas</mat-label>
+              <mat-label>{{ translationService.translate('alert_freq') }}</mat-label>
               <mat-select formControlName="alertFrequency">
-                <mat-option value="daily">Diária</mat-option>
-                <mat-option value="weekly">Semanal</mat-option>
+                <mat-option value="daily">{{ translationService.translate('daily') }}</mat-option>
+                <mat-option value="weekly">{{ translationService.translate('weekly') }}</mat-option>
+                <mat-option value="monthly">{{ translationService.translate('monthly') }}</mat-option>
               </mat-select>
             </mat-form-field>
           </div>
 
           <div class="settings__actions">
             <button mat-flat-button color="primary" type="submit" [disabled]="settingsForm.invalid">
-              Salvar Configurações
+              {{ translationService.translate('save_settings') }}
             </button>
           </div>
         </form>

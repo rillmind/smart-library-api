@@ -6,8 +6,11 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { BOOK_CATEGORY_LABELS, BookCategory, Book } from '../../../../core/models/book.model';
 import { MockDataService } from '../../../../shared/services/mock-data.service';
+import { BookService } from '../../../../core/services/book.service';
+import { TranslationService } from '../../../../core/services/translation.service';
 
 @Component({
   selector: 'app-book-form-drawer',
@@ -27,6 +30,9 @@ import { MockDataService } from '../../../../shared/services/mock-data.service';
 export class BookFormDrawerComponent {
   private fb = inject(FormBuilder);
   private mockData = inject(MockDataService);
+  private bookService = inject(BookService);
+  private snackBar = inject(MatSnackBar);
+  translationService = inject(TranslationService);
 
   closed = output<void>();
   bookSaved = output<void>();
@@ -105,13 +111,46 @@ export class BookFormDrawerComponent {
       };
 
       if (this.isEditing() && this.editingBookId) {
-        this.mockData.updateBook(this.editingBookId, bookData);
+        this.bookService.updateBook(this.editingBookId, bookData).subscribe({
+          next: () => {
+            this.snackBar.open('Livro atualizado com sucesso!', 'Fechar', {
+              duration: 4000,
+              horizontalPosition: 'end',
+              verticalPosition: 'top',
+            });
+            this.bookSaved.emit();
+            this.close();
+          },
+          error: (err) => {
+            const msg = err?.error?.message || 'Erro ao atualizar livro. Tente novamente.';
+            this.snackBar.open(msg, 'Fechar', {
+              duration: 6000,
+              horizontalPosition: 'end',
+              verticalPosition: 'top',
+            });
+          },
+        });
       } else {
-        this.mockData.addBook(bookData);
+        this.bookService.addBook(bookData).subscribe({
+          next: () => {
+            this.snackBar.open('Livro cadastrado com sucesso!', 'Fechar', {
+              duration: 4000,
+              horizontalPosition: 'end',
+              verticalPosition: 'top',
+            });
+            this.bookSaved.emit();
+            this.close();
+          },
+          error: (err) => {
+            const msg = err?.error?.message || 'Erro ao cadastrar livro. Tente novamente.';
+            this.snackBar.open(msg, 'Fechar', {
+              duration: 6000,
+              horizontalPosition: 'end',
+              verticalPosition: 'top',
+            });
+          },
+        });
       }
-
-      this.bookSaved.emit();
-      this.close();
     } else {
       this.bookForm.markAllAsTouched();
     }

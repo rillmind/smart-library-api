@@ -3,6 +3,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../../../core/services/auth.service';
+import { TranslationService } from '../../../../core/services/translation.service';
 
 @Component({
   selector: 'app-login',
@@ -17,6 +18,7 @@ import { AuthService } from '../../../../core/services/auth.service';
 })
 export class LoginComponent {
   private authService = inject(AuthService);
+  translationService = inject(TranslationService);
 
   loginAdmin(): void {
     this.authService.loginAsAdmin();

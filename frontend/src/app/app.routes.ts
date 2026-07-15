@@ -35,6 +35,12 @@ export const routes: Routes = [
         loadChildren: () =>
           import('./features/settings/settings.routes').then((m) => m.SETTINGS_ROUTES),
       },
+      {
+        path: 'audit',
+        canActivate: [adminGuard],
+        loadComponent: () =>
+          import('./features/audit/pages/audit-list/audit-list.component').then((m) => m.AuditListComponent),
+      },
     ],
   },
   {

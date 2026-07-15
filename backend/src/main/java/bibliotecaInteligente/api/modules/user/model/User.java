@@ -22,11 +22,14 @@ public class User {
     @CPF
     @NotBlank
     @Column(unique = true, nullable = false)
-    private Integer cpf;
+    private String cpf;
 
     @Column(unique = true, nullable = false)
     private String email;
 
+    @Column(nullable = false)
+    private Boolean bloqueado = false;
+    
     @Column(nullable = false)
     private String password;
 }

@@ -1,12 +1,11 @@
 @if (isOpen()) {
-  
   <div class="drawer-overlay" (click)="close()"></div>
 
   <aside class="drawer">
     <div class="drawer__header">
       <h2 class="drawer__title">
         <mat-icon>{{ isEditing() ? 'edit' : 'add_circle' }}</mat-icon>
-        {{ isEditing() ? 'Editar Livro' : 'Novo Livro' }}
+        {{ isEditing() ? translationService.translate('edit_book') : translationService.translate('new_book') }}
       </h2>
       <button mat-icon-button (click)="close()" aria-label="Fechar">
         <mat-icon>close</mat-icon>
@@ -17,7 +16,7 @@
 
     <form [formGroup]="bookForm" (ngSubmit)="onSave()" class="drawer__form">
       <mat-form-field appearance="outline">
-        <mat-label>Título</mat-label>
+        <mat-label>{{ translationService.translate('title') }}</mat-label>
         <input matInput formControlName="title" placeholder="Ex: Clean Code" />
         @if (bookForm.get('title')?.hasError('required')) {
           <mat-error>Título é obrigatório</mat-error>
@@ -25,7 +24,7 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label>Autor</mat-label>
+        <mat-label>{{ translationService.translate('author') }}</mat-label>
         <input matInput formControlName="author" placeholder="Ex: Robert C. Martin" />
         @if (bookForm.get('author')?.hasError('required')) {
           <mat-error>Autor é obrigatório</mat-error>
@@ -42,53 +41,53 @@
 
       <div class="drawer__row">
         <mat-form-field appearance="outline">
-          <mat-label>Editora</mat-label>
+          <mat-label>{{ translationService.translate('publisher') }}</mat-label>
           <input matInput formControlName="publisher" />
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="drawer__field-sm">
-          <mat-label>Ano</mat-label>
+          <mat-label>{{ translationService.translate('year') }}</mat-label>
           <input matInput type="number" formControlName="year" />
         </mat-form-field>
       </div>
 
       <mat-form-field appearance="outline">
-        <mat-label>Categoria</mat-label>
+        <mat-label>{{ translationService.translate('category') }}</mat-label>
         <mat-select formControlName="category">
           @for (cat of categories(); track cat) {
-            <mat-option [value]="cat">{{ categoryLabels[cat] }}</mat-option>
+            <mat-option [value]="cat">{{ translationService.translate(cat) }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
 
       <div class="drawer__row">
         <mat-form-field appearance="outline" class="drawer__field-sm">
-          <mat-label>Exemplares</mat-label>
+          <mat-label>{{ translationService.translate('copies') }}</mat-label>
           <input matInput type="number" formControlName="totalCopies" />
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Biblioteca</mat-label>
+          <mat-label>{{ translationService.translate('library') }}</mat-label>
           <mat-select formControlName="libraryId">
             @for (lib of libraries(); track lib.id) {
-              <mat-option [value]="lib.id">{{ lib.name }}</mat-option>
+              <mat-option [value]="lib.id">{{ translationService.translate(lib.name) }}</mat-option>
             }
           </mat-select>
         </mat-form-field>
       </div>
 
       <mat-form-field appearance="outline">
-        <mat-label>Descrição</mat-label>
+        <mat-label>{{ translationService.translate('description') }}</mat-label>
         <textarea matInput formControlName="description" rows="3" placeholder="Sinopse do livro..."></textarea>
       </mat-form-field>
 
       <div class="drawer__actions">
         <button mat-flat-button color="primary" type="submit">
           <mat-icon>save</mat-icon>
-          Salvar
+          {{ translationService.translate('save') }}
         </button>
         <button mat-stroked-button type="button" (click)="close()">
-          Cancelar
+          {{ translationService.translate('cancel') }}
         </button>
       </div>
     </form>
