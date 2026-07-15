@@ -13,25 +13,65 @@
         <h2 class="login__card-title">{{ translationService.translate('login_portal_title') }}</h2>
         <p class="login__card-subtitle">{{ translationService.translate('login_portal_subtitle') }}</p>
 
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login__form">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>E-mail</mat-label>
+            <input matInput type="email" formControlName="email" placeholder="Ex: guga@ifpe.edu.br" required />
+            <mat-icon matSuffix>email</mat-icon>
+            @if (loginForm.get('email')?.hasError('email') && loginForm.get('email')?.touched) {
+              <mat-error>E-mail inválido</mat-error>
+            }
+            @if (loginForm.get('email')?.hasError('required') && loginForm.get('email')?.touched) {
+              <mat-error>O e-mail é obrigatório</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Senha</mat-label>
+            <input matInput type="password" formControlName="password" placeholder="Digite sua senha" required />
+            <mat-icon matSuffix>lock</mat-icon>
+            @if (loginForm.get('password')?.hasError('required') && loginForm.get('password')?.touched) {
+              <mat-error>A senha é obrigatória</mat-error>
+            }
+          </mat-form-field>
+
+          <button mat-flat-button color="primary" type="submit" class="login__submit-btn" [disabled]="loginForm.invalid || isLoading">
+            @if (isLoading) {
+              Acessando...
+            } @else {
+              Entrar
+            }
+          </button>
+        </form>
+
+        <div class="login__actions">
+          <span class="login__register-text">Não tem uma conta?</span>
+          <a routerLink="/auth/register" class="login__register-link">Cadastre-se</a>
+        </div>
+
+        <div class="login__separator">
+          <span>OU ACESSO RÁPIDO</span>
+        </div>
+
         <div class="login__quick-access">
-          <button type="button" class="login__role-card login__role-card--admin" (click)="loginAdmin()">
+          <button type="button" class="login__role-card login__role-card--admin" (click)="loginQuickAdmin()">
             <div class="login__role-icon-wrapper">
               <mat-icon>admin_panel_settings</mat-icon>
             </div>
             <div class="login__role-info">
-              <h3>{{ translationService.translate('login_admin_title') }}</h3>
-              <p>{{ translationService.translate('login_admin_subtitle') }}</p>
+              <h3>Administrador</h3>
+              <p>Gerenciamento completo</p>
             </div>
             <mat-icon class="login__role-arrow">chevron_right</mat-icon>
           </button>
 
-          <button type="button" class="login__role-card login__role-card--user" (click)="loginUser()">
+          <button type="button" class="login__role-card login__role-card--user" (click)="loginQuickUser()">
             <div class="login__role-icon-wrapper">
               <mat-icon>account_circle</mat-icon>
             </div>
             <div class="login__role-info">
-              <h3>{{ translationService.translate('login_user_title') }}</h3>
-              <p>{{ translationService.translate('login_user_subtitle') }}</p>
+              <h3>Leitor / Aluno</h3>
+              <p>Reserva e empréstimos</p>
             </div>
             <mat-icon class="login__role-arrow">chevron_right</mat-icon>
           </button>

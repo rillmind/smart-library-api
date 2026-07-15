@@ -3,6 +3,7 @@ package bibliotecaInteligente.api.modules.livro.service;
 import bibliotecaInteligente.api.modules.emprestimo.repository.EmprestimoRpository;
 import bibliotecaInteligente.api.modules.livro.model.Livro;
 import bibliotecaInteligente.api.modules.livro.repository.LivroRpository;
+import bibliotecaInteligente.api.modules.user.model.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -72,8 +73,33 @@ public class LivroService {
         if (livro.getDescricao() != null) {
             livroEntity.setDescricao(livro.getDescricao());
         }
+        if (livro.getIsbn() != null) {
+            livroEntity.setIsbn(livro.getIsbn());
+        }
+        if (livro.getEditora() != null) {
+            livroEntity.setEditora(livro.getEditora());
+        }
+        if (livro.getAno() != null) {
+            livroEntity.setAno(livro.getAno());
+        }
+        if (livro.getCategoria() != null) {
+            livroEntity.setCategoria(livro.getCategoria());
+        }
+        if (livro.getTotalCopies() != null) {
+            livroEntity.setTotalCopies(livro.getTotalCopies());
+        }
+        if (livro.getLibraryId() != null) {
+            livroEntity.setLibraryId(livro.getLibraryId());
+        }
 
         livroRepository.saveAndFlush(livroEntity);
-        auditLogService.registrarLog("Livro atualizado: " + livroEntity.getTitulo() + " (ID: " + id + ")", "Administrador");
+        auditLogService.registrarLog("Livro updated: " + livroEntity.getTitulo() + " (ID: " + id + ")", "Administrador");
+    }
+
+    @Transactional
+    public void atualizarPosse(Integer id, User usuario) {
+        Livro livro = buscarLivroPorId(id);
+        livro.setPosse(usuario);
+        livroRepository.saveAndFlush(livro);
     }
 }

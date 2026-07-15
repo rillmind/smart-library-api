@@ -8,6 +8,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { DatePipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { User, USER_TYPE_LABELS } from '../../../../core/models/user.model';
@@ -30,6 +31,7 @@ import { TranslationService } from '../../../../core/services/translation.servic
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
+    MatSnackBarModule,
     DatePipe,
     FormsModule,
     ReactiveFormsModule,
@@ -42,6 +44,7 @@ export class UserProfileComponent implements OnInit {
   private loanService = inject(LoanService);
   private userService = inject(UserService);
   private dialog = inject(MatDialog);
+  private snackBar = inject(MatSnackBar);
   translationService = inject(TranslationService);
 
   user = signal<User | null>(null);
@@ -55,7 +58,8 @@ export class UserProfileComponent implements OnInit {
   editProfileForm = new FormGroup({
     name: new FormControl('', { validators: [Validators.required], nonNullable: true }),
     email: new FormControl('', { validators: [Validators.required, Validators.email], nonNullable: true }),
-    password: new FormControl(''),
+    currentPassword: new FormControl('', { validators: [Validators.required], nonNullable: true }),
+    newPassword: new FormControl(''),
   });
 
   ngOnInit(): void {
@@ -71,6 +75,13 @@ export class UserProfileComponent implements OnInit {
         this.userStats.set({ totalLoans, activeLoans, overdueLoans, returnedLoans });
       });
     }
+  }
+
+  formatCpf(cpf: string): string {
+    if (!cpf) return '';
+    const clean = cpf.replace(/\D/g, '');
+    if (clean.length !== 11) return cpf;
+    return clean.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
   }
 
   getInitials(name: string): string {
@@ -98,7 +109,8 @@ export class UserProfileComponent implements OnInit {
       this.editProfileForm.patchValue({
         name: currentUser.name,
         email: currentUser.email,
-        password: '',
+        currentPassword: '',
+        newPassword: '',
       });
       this.dialog.open(template, {
         width: '450px',
@@ -112,21 +124,32 @@ export class UserProfileComponent implements OnInit {
 
     const currentUser = this.user();
     if (currentUser) {
-      const { name, email, password } = this.editProfileForm.getRawValue();
-      const updatedData: any = {
-        name,
-        email,
-        enrollment: currentUser.enrollment,
-      };
-      if (password) {
-        updatedData.password = password;
-      }
+      const { name, email, currentPassword, newPassword } = this.editProfileForm.getRawValue();
 
-      this.userService.updateUser(currentUser.id, updatedData).subscribe(() => {
-        const updatedUser = { ...currentUser, name, email };
-        this.authService.currentUser.set(updatedUser);
-        this.user.set(updatedUser);
-        this.dialog.closeAll();
+      // Valida a senha atual fazendo uma tentativa de login síncrona
+      this.authService.login(currentUser.email, currentPassword).subscribe({
+        next: () => {
+          // Senha válida! Prossegue com a atualização de dados
+          const updatedData: any = {
+            nome: name,
+            email,
+            cpf: currentUser.id,
+          };
+          if (newPassword) {
+            updatedData.password = newPassword;
+          }
+
+          this.userService.updateUser(currentUser.id, updatedData).subscribe(() => {
+            const updatedUser = { ...currentUser, name, email };
+            this.authService.currentUser.set(updatedUser);
+            this.user.set(updatedUser);
+            this.snackBar.open('Perfil atualizado com sucesso!', 'Fechar', { duration: 3000 });
+            this.dialog.closeAll();
+          });
+        },
+        error: () => {
+          this.snackBar.open('Senha atual incorreta! Acesso negado.', 'Fechar', { duration: 4000 });
+        }
       });
     }
   }

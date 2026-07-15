@@ -24,12 +24,12 @@ public class NotificacaoService {
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado!"));
 
         Notificacao notificacao = Notificacao.builder()
-                .id_usuario(usuario)
+                .idUsuario(usuario)
                 .titulo(titulo)
                 .mensagem(mensagem)
                 .tipo(tipo)
                 .lida(false)
-                .data_criacao(LocalDate.now().toString())
+                .dataCriacao(LocalDate.now().toString())
                 .build();
 
         notificacaoRepository.save(notificacao);

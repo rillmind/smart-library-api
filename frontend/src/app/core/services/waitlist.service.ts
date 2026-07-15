@@ -50,12 +50,12 @@ export class WaitlistService {
   private mapToFrontend(item: any): WaitlistEntry {
     return {
       id: String(item.id),
-      userId: item.id_usuario?.cpf || '',
-      userName: item.id_usuario?.nome || '',
-      bookId: String(item.id_livro?.id || ''),
-      bookTitle: item.id_livro?.titulo || '',
+      userId: item.idUsuario?.cpf || '',
+      userName: item.idUsuario?.nome || '',
+      bookId: String(item.idLivro?.id || ''),
+      bookTitle: item.idLivro?.titulo || '',
       position: item.posicao || 0,
-      entryDate: new Date(item.data_entrada),
+      entryDate: item.dataEntrada ? new Date(item.dataEntrada) : new Date(),
       status: item.status || 'AGUARDANDO',
     };
   }

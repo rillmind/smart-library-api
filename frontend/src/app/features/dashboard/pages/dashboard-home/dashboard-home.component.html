@@ -51,7 +51,7 @@
             <th mat-header-cell *matHeaderCellDef>{{ translationService.translate('status') }}</th>
             <td mat-cell *matCellDef="let loan">
               <span class="status-badge" [class]="getStatusClass(loan.status)">
-                {{ statusLabels[loan.status] }}
+                {{ translationService.translate(loan.status) }}
               </span>
             </td>
           </ng-container>

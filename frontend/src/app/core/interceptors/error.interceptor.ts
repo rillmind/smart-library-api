@@ -18,7 +18,12 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       if (error.error instanceof ErrorEvent) {
         errorMessage = error.error.message;
       } else if (error.error && typeof error.error === 'string') {
-        errorMessage = error.error;
+        try {
+          const parsed = JSON.parse(error.error);
+          errorMessage = parsed.message || parsed.error || error.error;
+        } catch (e) {
+          errorMessage = error.error;
+        }
       } else if (error.message) {
         errorMessage = error.message;
       }

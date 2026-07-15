@@ -20,14 +20,14 @@ public class FilaEspera {
 
     @ManyToOne
     @JoinColumn(name = "id_usuario")
-    private User id_usuario;
+    private User idUsuario;
 
     @ManyToOne
     @JoinColumn(name = "id_livro")
-    private Livro id_livro;
+    private Livro idLivro;
 
-    @Column
-    private String data_entrada;
+    @Column(name = "data_entrada")
+    private String dataEntrada;
 
     @Column
     private Integer posicao;

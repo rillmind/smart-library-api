@@ -64,6 +64,13 @@ export class UserListComponent implements OnInit {
     this.libraries.set([...this.mockDataService.getLibraries()]);
   }
 
+  formatCpf(cpf: string): string {
+    if (!cpf) return '';
+    const clean = cpf.replace(/\D/g, '');
+    if (clean.length !== 11) return cpf;
+    return clean.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+  }
+
   openUserForm(template: TemplateRef<any>, user?: User): void {
     if (user) {
       this.isEditing.set(true);
@@ -76,6 +83,10 @@ export class UserListComponent implements OnInit {
         type: user.type,
         libraryId: user.libraryId,
       });
+      this.userForm.controls.enrollment.disable();
+      this.userForm.controls.phone.disable();
+      this.userForm.controls.type.disable();
+      this.userForm.controls.libraryId.disable();
     } else {
       this.isEditing.set(false);
       this.editingUserId = null;
@@ -87,6 +98,10 @@ export class UserListComponent implements OnInit {
         type: 'STUDENT',
         libraryId: '1',
       });
+      this.userForm.controls.enrollment.enable();
+      this.userForm.controls.phone.enable();
+      this.userForm.controls.type.enable();
+      this.userForm.controls.libraryId.enable();
     }
 
     this.dialog.open(template, {

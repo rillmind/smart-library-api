@@ -1,0 +1,82 @@
+<div class="login-page">
+  <div class="login-container animate-fade-in">
+    <div class="login__branding">
+      <div class="login__logo">
+        <mat-icon class="login__logo-icon">local_library</mat-icon>
+      </div>
+      <h1 class="login__title">Smart Library</h1>
+      <p class="login__subtitle">Crie sua conta na plataforma compartilhada</p>
+    </div>
+
+    <mat-card class="login__card">
+      <mat-card-content>
+        <h2 class="login__card-title">Criar Conta</h2>
+        <p class="login__card-subtitle">Preencha seus dados para ter acesso ao acervo</p>
+
+        <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="login__form">
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Nome Completo</mat-label>
+            <input matInput formControlName="nome" placeholder="Ex: Gustavo de Lima" required />
+            <mat-icon matSuffix>person</mat-icon>
+            @if (registerForm.get('nome')?.hasError('required') && registerForm.get('nome')?.touched) {
+              <mat-error>O nome é obrigatório</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>E-mail</mat-label>
+            <input matInput type="email" formControlName="email" placeholder="Ex: guga@ifpe.edu.br" required />
+            <mat-icon matSuffix>email</mat-icon>
+            @if (registerForm.get('email')?.hasError('email') && registerForm.get('email')?.touched) {
+              <mat-error>E-mail inválido</mat-error>
+            }
+            @if (registerForm.get('email')?.hasError('required') && registerForm.get('email')?.touched) {
+              <mat-error>O e-mail é obrigatório</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>CPF</mat-label>
+            <input matInput formControlName="cpf" placeholder="Ex: 111.222.333-44" (input)="onCpfInput($event)" required maxlength="14" />
+            <mat-icon matSuffix>badge</mat-icon>
+            @if (registerForm.get('cpf')?.hasError('pattern') && registerForm.get('cpf')?.touched) {
+              <mat-error>CPF deve conter exatamente 11 dígitos numéricos</mat-error>
+            }
+            @if (registerForm.get('cpf')?.hasError('required') && registerForm.get('cpf')?.touched) {
+              <mat-error>O CPF é obrigatório</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Senha</mat-label>
+            <input matInput type="password" formControlName="password" placeholder="Mínimo 6 caracteres" required />
+            <mat-icon matSuffix>lock</mat-icon>
+            @if (registerForm.get('password')?.hasError('minlength') && registerForm.get('password')?.touched) {
+              <mat-error>Senha deve ter no mínimo 6 caracteres</mat-error>
+            }
+            @if (registerForm.get('password')?.hasError('required') && registerForm.get('password')?.touched) {
+              <mat-error>A senha é obrigatória</mat-error>
+            }
+          </mat-form-field>
+
+          <button mat-flat-button color="primary" type="submit" class="login__submit-btn" [disabled]="registerForm.invalid || isLoading">
+            @if (isLoading) {
+              Cadastrando...
+            } @else {
+              Cadastrar
+            }
+          </button>
+        </form>
+
+        <div class="login__actions">
+          <span class="login__register-text">Já possui uma conta?</span>
+          <a routerLink="/auth/login" class="login__register-link">Acessar portal</a>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <p class="login__footer">
+      {{ translationService.translate('login_footer') }}
+    </p>
+  </div>
+</div>

@@ -60,14 +60,16 @@
               </div>
             } @else {
               @if (book.availableCopies > 0) {
+                @let hasActive = hasActiveLoanForBook(book.id);
                 <button
                   mat-flat-button
                   color="primary"
+                  [disabled]="hasActive || requestingBookId() === book.id"
                   (click)="requestLoan(book)"
                   type="button"
                   style="height: 36px; padding: 0 16px; min-width: 90px; line-height: 36px;"
                 >
-                  {{ translationService.translate('request') }}
+                  {{ hasActive ? 'Você já possui' : (requestingBookId() === book.id ? 'Processando...' : translationService.translate('request')) }}
                 </button>
               } @else {
                 @let waitlistEntry = getWaitlistEntry(book.id);

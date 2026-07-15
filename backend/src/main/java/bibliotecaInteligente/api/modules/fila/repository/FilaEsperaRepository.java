@@ -11,9 +11,9 @@ import java.util.Optional;
 
 @Repository
 public interface FilaEsperaRepository extends JpaRepository<FilaEspera, Integer> {
-    List<FilaEspera> findByIdLivroOrderByPosicaoAsc(Livro id_livro);
-    List<FilaEspera> findByIdUsuario(User id_usuario);
-    long countByIdLivroAndStatus(Livro id_livro, String status);
-    Optional<FilaEspera> findFirstByIdLivroAndStatusOrderByPosicaoAsc(Livro id_livro, String status);
-    boolean existsByIdUsuarioAndIdLivroAndStatus(User id_usuario, Livro id_livro, String status);
+    List<FilaEspera> findByIdLivroOrderByPosicaoAsc(Livro idLivro);
+    List<FilaEspera> findByIdUsuario(User idUsuario);
+    long countByIdLivroAndStatus(Livro idLivro, String status);
+    Optional<FilaEspera> findFirstByIdLivroAndStatusOrderByPosicaoAsc(Livro idLivro, String status);
+    boolean existsByIdUsuarioAndIdLivroAndStatus(User idUsuario, Livro idLivro, String status);
 }

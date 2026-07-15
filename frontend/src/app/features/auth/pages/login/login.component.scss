@@ -15,10 +15,14 @@
   align-items: center;
 }
 
+.w-full {
+  width: 100%;
+}
+
 .login {
   &__branding {
     text-align: center;
-    margin-bottom: var(--spacing-xl);
+    margin-bottom: var(--spacing-lg);
   }
 
   &__logo {
@@ -56,7 +60,7 @@
     width: 100%;
     border-radius: var(--radius-xl) !important;
     box-shadow: var(--shadow-lg) !important;
-    padding: var(--spacing-lg);
+    padding: var(--spacing-md);
   }
 
   &__card-title {
@@ -74,17 +78,78 @@
     text-align: center;
   }
 
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+
+  &__submit-btn {
+    width: 100%;
+    height: 48px !important;
+    font-size: var(--font-size-md) !important;
+    margin-top: var(--spacing-sm);
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-md);
+    font-size: var(--font-size-sm);
+  }
+
+  &__register-text {
+    color: var(--color-text-secondary);
+  }
+
+  &__register-link {
+    font-weight: 600;
+    color: var(--color-primary);
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__separator {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: var(--spacing-lg) 0;
+    color: var(--color-text-disabled);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+
+    &::before, &::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    &:not(:empty)::before {
+      margin-right: .5em;
+    }
+
+    &:not(:empty)::after {
+      margin-left: .5em;
+    }
+  }
+
   &__quick-access {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-md);
+    gap: var(--spacing-sm);
   }
 
   &__role-card {
     display: flex;
     align-items: center;
     width: 100%;
-    padding: var(--spacing-md);
+    padding: var(--spacing-sm) var(--spacing-md);
     background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
@@ -136,8 +201,8 @@
   }
 
   &__role-icon-wrapper {
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
     border-radius: var(--radius-md);
     background-color: var(--color-background);
     color: var(--color-text-secondary);
@@ -149,9 +214,9 @@
     flex-shrink: 0;
 
     mat-icon {
-      font-size: 28px;
-      width: 28px;
-      height: 28px;
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
     }
   }
 
@@ -159,17 +224,17 @@
     flex: 1;
 
     h3 {
-      font-size: var(--font-size-md);
+      font-size: var(--font-size-sm);
       font-weight: 600;
       color: var(--color-text-primary);
-      margin: 0 0 var(--spacing-xs) 0;
+      margin: 0 0 2px 0;
     }
 
     p {
       font-size: var(--font-size-xs);
       color: var(--color-text-secondary);
       margin: 0;
-      line-height: 1.4;
+      line-height: 1.3;
     }
   }
 

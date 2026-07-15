@@ -2,9 +2,13 @@
 
 Registro de todas as alterações realizadas no projeto para controle interno e acompanhamento da equipe.
 
-## [2026-07-15] — Fila de Espera de Livros e Centro de Notificações In-App
+## [2026-07-15] — Autenticação Real (Login e Cadastro), Fila de Espera e Correções Críticas de Estoque
 
 ### Adicionado
+- **Cadastro e Login Reais no Frontend (RF01):**
+  - Criei a tela de Cadastro de Usuários (`/auth/register`) no frontend com formulário completo validado reativamente e integrado ao endpoint `/register` do Spring Boot.
+  - Atualizei a tela de Login (`/auth/login`) para expor formulário real de e-mail e senha conectado ao endpoint de autenticação real.
+  - Desenvolvi a lógica no `AuthService` para realizar o login real e, na sequência, obter dinamicamente os detalhes do usuário chamando o endpoint `/listar` para identificar perfil de acesso (ADMIN vs LEITOR).
 - **Módulo de Fila de Espera no Backend (RF05):**
   - Criei a entidade JPA `FilaEspera.java` (`tb_fila_espera`), repositório `FilaEsperaRepository.java`, serviço `FilaEsperaService.java` e controlador REST `FilaEsperaController.java` exposto no endpoint `/fila-espera`.
   - Desenvolvi a lógica de entrada e saída da fila, cálculo de posições reativas e acionamento automático de notificações.
@@ -22,11 +26,26 @@ Registro de todas as alterações realizadas no projeto para controle interno e 
   - Conectei o botão de notificações do `HeaderComponent` ao `unreadCount` reativo do `NotificationService`, exibindo em tempo real e de forma animada o número de mensagens pendentes de leitura.
 - **Ações de Fila de Espera no Catálogo de Livros (RF05):**
   - Atualizei a listagem do catálogo `/books`. Para livros com cópias esgotadas (`availableCopies === 0`), exibo um botão de "Entrar na Fila" ou "Sair da Fila", calculando os status em tempo real com base no usuário logado.
+- **Prorrogação Customizada com Calendário (MatDatepicker):**
+  - Integrei o `MatDatepickerModule` do Angular Material na listagem de empréstimos e criei o modal de prorrogação interativo. Agora, ao renovar ou prorrogar, o administrador escolhe a data limite de devolução diretamente em um calendário visual premium, com a data padrão de +14 dias sugerida e datas passadas desabilitadas.
+- **Máscara de CPF e Formatação Visual:**
+  - Adicionei máscara interativa de CPF (`000.000.000-00`) em tempo de digitação no formulário de Cadastro de novos membros.
+  - Criei métodos de formatação e apliquei a exibição estruturada com pontos e traços para todos os CPFs mostrados no Perfil do Usuário e na Listagem de Usuários do Administrador.
 
 ### Alterado
 - **Estrutura de Rotas e Sidebar:**
   - Registrei a rota lazy-loaded de `/notifications` no `app.routes.ts`.
   - Inseri o atalho de Notificações com badge contador dinâmico na Sidebar de navegação lateral para todos os perfis.
+- **Validação de Segurança com Senha Atual no Perfil:**
+  - Reestruturei o formulário de edição de dados do perfil do usuário comum para exigir o preenchimento da **Senha Atual**. O frontend realiza uma validação síncrona contra o endpoint de login do backend antes de aceitar e processar as atualizações, garantindo a proteção da conta.
+- **Bloqueio de Edição de Dados Sensíveis de Membros:**
+  - Desabilitei visualmente os campos de CPF, Telefone, Tipo de Membro e Biblioteca no modal de edição de membros para administradores. Isso evita inconsistências, visto que o backend não persiste ou atualiza essas propriedades sensíveis em tempo de execução.
+- **Tradução Reativa de Status de Empréstimos:**
+  - Mapeei os status `ACTIVE`, `RETURNED`, `OVERDUE` e `RESERVED` no `TranslationService`. Substituí a exibição de labels fixas por chamadas dinâmicas para acompanhar o idioma ativo na Home do Dashboard, na Listagem Geral de Empréstimos e no Perfil do Leitor.
+- **Ordenação Prioritária de Empréstimos:**
+  - Modifiquei a propriedade computada `filteredLoans` do administrador para ordenar e fixar automaticamente os empréstimos em aberto (Ativos e Atrasados) no topo da tabela, facilitando o gerenciamento do acervo.
+- **Parse de Mensagens de Erro Brutas:**
+  - Adicionei tratamento no interceptor global de erros para capturar strings JSON de erros do Spring Boot e realizar o parse automático para exibir textos amigáveis no SnackBar em vez do payload técnico.
 
 ---
 

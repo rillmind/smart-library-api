@@ -54,6 +54,12 @@ export class BookService {
       titulo: book.title,
       autor: book.author,
       descricao: book.description || '',
+      isbn: book.isbn,
+      editora: book.publisher,
+      ano: book.year,
+      categoria: book.category,
+      totalCopies: book.totalCopies,
+      libraryId: book.libraryId,
     };
     return this.http.put(`${this.apiUrl}/${id}`, backendBook);
   }
@@ -80,7 +86,7 @@ export class BookService {
       year: l.ano || 2026,
       category: l.categoria || 'TECHNOLOGY',
       totalCopies: l.totalCopies || 1,
-      availableCopies: l.posse ? 0 : 1,
+      availableCopies: l.availableCopies !== undefined ? l.availableCopies : (l.posse ? 0 : 1),
       libraryId: l.libraryId || '1',
       coverUrl: l.coverUrl || null,
       description: l.descricao || '',
@@ -92,6 +98,12 @@ export class BookService {
       titulo: b.title,
       autor: b.author,
       descricao: b.description || '',
+      isbn: b.isbn || 'N/A',
+      editora: b.publisher || 'Editora Geral',
+      ano: b.year || 2026,
+      categoria: b.category || 'TECHNOLOGY',
+      totalCopies: b.totalCopies || 1,
+      libraryId: b.libraryId || '1',
     };
   }
 }

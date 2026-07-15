@@ -8,6 +8,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { DatePipe } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { provideNativeDateAdapter } from '@angular/material/core';
 import { LoanService } from '../../../../core/services/loan.service';
 import { BookService } from '../../../../core/services/book.service';
 import { UserService } from '../../../../core/services/user.service';
@@ -28,10 +30,12 @@ import { TranslationService } from '../../../../core/services/translation.servic
     MatInputModule,
     MatSelectModule,
     MatDialogModule,
+    MatDatepickerModule,
     DatePipe,
     FormsModule,
     ReactiveFormsModule,
   ],
+  providers: [provideNativeDateAdapter()],
   templateUrl: './loan-list.component.html',
   styleUrl: './loan-list.component.scss',
 })
@@ -49,6 +53,8 @@ export class LoanListComponent implements OnInit {
   selectedLoan = signal<Loan | null>(null);
   users = signal<User[]>([]);
   books = signal<Book[]>([]);
+  renewDate: Date | null = null;
+  minDate = new Date();
 
   statusLabels: Record<string, string> = LOAN_STATUS_LABELS;
 
@@ -82,7 +88,24 @@ export class LoanListComponent implements OnInit {
       list = list.filter((l) => l.status === filter);
     }
 
-    return list;
+    // Ordenação personalizada: atrasados e ativos no topo, devolvidos abaixo
+    return [...list].sort((a, b) => {
+      const getWeight = (status: LoanStatus) => {
+        if (status === 'OVERDUE') return 1;
+        if (status === 'ACTIVE') return 2;
+        if (status === 'RESERVED') return 3;
+        return 4; // RETURNED
+      };
+      const weightA = getWeight(a.status);
+      const weightB = getWeight(b.status);
+
+      if (weightA !== weightB) {
+        return weightA - weightB;
+      }
+
+      // Desempate: data de empréstimo decrescente
+      return new Date(b.loanDate).getTime() - new Date(a.loanDate).getTime();
+    });
   });
 
 
@@ -167,11 +190,37 @@ export class LoanListComponent implements OnInit {
     }
   }
 
-  renew(id: string): void {
-    this.loanService.renovarEmprestimo(id).subscribe(() => {
-      this.loadData();
-      this.dialog.closeAll();
+  openRenewLoan(loan: Loan, template: TemplateRef<any>): void {
+    this.selectedLoan.set(loan);
+    const date = new Date(loan.dueDate);
+    date.setDate(date.getDate() + 14); // 14 dias a partir da data de devolução atual
+    this.renewDate = date;
+
+    // Define o minDate como a data de vencimento atual do empréstimo (ou hoje, o que for maior)
+    const today = new Date();
+    const currentDueDate = new Date(loan.dueDate);
+    this.minDate = currentDueDate > today ? currentDueDate : today;
+
+    this.dialog.open(template, {
+      width: '400px',
+      panelClass: 'custom-dialog-container',
     });
+  }
+
+  submitRenew(): void {
+    const loan = this.selectedLoan();
+    if (loan && this.renewDate) {
+      this.loanService.updateLoan(loan.id, {
+        dueDate: this.renewDate,
+        status: loan.status,
+        userId: loan.userId,
+        bookId: loan.bookId,
+        loanDate: loan.loanDate
+      }).subscribe(() => {
+        this.loadData();
+        this.dialog.closeAll();
+      });
+    }
   }
 
   returnLoan(id: string): void {

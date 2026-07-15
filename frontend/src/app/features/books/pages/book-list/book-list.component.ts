@@ -47,6 +47,8 @@ export class BookListComponent implements OnInit {
   bookDrawer = viewChild<BookFormDrawerComponent>('bookDrawer');
   allBooks = signal<Book[]>([]);
   myWaitlist = signal<WaitlistEntry[]>([]);
+  myActiveLoans = signal<any[]>([]);
+  requestingBookId = signal<string | null>(null);
   categoryLabels = BOOK_CATEGORY_LABELS;
 
   filteredBooks = computed(() => {
@@ -64,6 +66,7 @@ export class BookListComponent implements OnInit {
   ngOnInit(): void {
     this.loadBooks();
     this.loadMyWaitlist();
+    this.loadMyActiveLoans();
   }
 
   loadBooks(): void {
@@ -77,6 +80,18 @@ export class BookListComponent implements OnInit {
     if (user && !this.authService.isAdmin()) {
       this.waitlistService.getMyWaitlist(user.id).subscribe((entries) => {
         this.myWaitlist.set(entries);
+      });
+    }
+  }
+
+  loadMyActiveLoans(): void {
+    const user = this.authService.currentUser();
+    if (user && !this.authService.isAdmin()) {
+      this.loanService.getLoans().subscribe((loans) => {
+        const active = loans.filter(
+          (l) => l.userId === user.id && (l.status === 'ACTIVE' || l.status === 'OVERDUE')
+        );
+        this.myActiveLoans.set(active);
       });
     }
   }
@@ -117,6 +132,9 @@ export class BookListComponent implements OnInit {
   }
 
   requestLoan(book: Book): void {
+    if (this.requestingBookId()) return;
+    this.requestingBookId.set(String(book.id));
+
     const user = this.authService.currentUser();
     if (user) {
       const dueDate = new Date();
@@ -134,13 +152,26 @@ export class BookListComponent implements OnInit {
         libraryId: user.libraryId || '1',
       };
 
-      this.loanService.addLoan(loanData).subscribe(() => {
-        this.snackBar.open('Empréstimo solicitado com sucesso!', 'Fechar', {
-          duration: 4000,
-          horizontalPosition: 'end',
-          verticalPosition: 'top',
-        });
-        this.loadBooks();
+      this.loanService.addLoan(loanData).subscribe({
+        next: () => {
+          this.snackBar.open('Empréstimo solicitado com sucesso!', 'Fechar', {
+            duration: 4000,
+            horizontalPosition: 'end',
+            verticalPosition: 'top',
+          });
+          this.loadBooks();
+          this.loadMyActiveLoans();
+          this.requestingBookId.set(null);
+        },
+        error: (err) => {
+          const msg = err?.error?.message || 'Erro ao solicitar empréstimo.';
+          this.snackBar.open(msg, 'Fechar', {
+            duration: 4000,
+            horizontalPosition: 'end',
+            verticalPosition: 'top',
+          });
+          this.requestingBookId.set(null);
+        }
       });
     }
   }
@@ -182,5 +213,9 @@ export class BookListComponent implements OnInit {
       });
       this.loadMyWaitlist();
     });
+  }
+
+  hasActiveLoanForBook(bookId: string): boolean {
+    return this.myActiveLoans().some(l => String(l.bookId) === String(bookId));
   }
 }

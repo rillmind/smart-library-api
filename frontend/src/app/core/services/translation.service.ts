@@ -96,7 +96,7 @@ export class TranslationService {
       unavailable: 'Indisponível',
       request: 'Solicitar',
       no_books_found: 'Nenhum livro encontrado.',
-      enrollment: 'Matrícula',
+      enrollment: 'CPF',
       member_since: 'Membro desde',
       edit_profile: 'Editar Perfil',
       total_loans: 'Total de Empréstimos',
@@ -177,6 +177,10 @@ export class TranslationService {
       notifications_center: 'Central de Notificações',
       mark_all_read: 'Marcar todas como lidas',
       no_notifications: 'Nenhuma notificação encontrada.',
+      ACTIVE: 'Ativo',
+      RETURNED: 'Devolvido',
+      OVERDUE: 'Atrasado',
+      RESERVED: 'Reservado',
     },
     'en': {
       dashboard: 'Dashboard',
@@ -346,6 +350,10 @@ export class TranslationService {
       notifications_center: 'Notification Center',
       mark_all_read: 'Mark all as read',
       no_notifications: 'No notifications found.',
+      ACTIVE: 'Active',
+      RETURNED: 'Returned',
+      OVERDUE: 'Overdue',
+      RESERVED: 'Reserved',
     },
     'es': {
       dashboard: 'Tablero',
@@ -515,6 +523,10 @@ export class TranslationService {
       notifications_center: 'Centro de Notificaciones',
       mark_all_read: 'Marcar todas como leídas',
       no_notifications: 'No se encontraron notificaciones.',
+      ACTIVE: 'Activo',
+      RETURNED: 'Devuelto',
+      OVERDUE: 'Atrasado',
+      RESERVED: 'Reservado',
     },
   };
 

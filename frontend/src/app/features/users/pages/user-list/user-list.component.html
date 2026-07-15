@@ -19,7 +19,7 @@
 
       <ng-container matColumnDef="enrollment">
         <th mat-header-cell *matHeaderCellDef>CPF</th>
-        <td mat-cell *matCellDef="let user">{{ user.enrollment }}</td>
+        <td mat-cell *matCellDef="let user">{{ formatCpf(user.enrollment) }}</td>
       </ng-container>
 
       <ng-container matColumnDef="email">

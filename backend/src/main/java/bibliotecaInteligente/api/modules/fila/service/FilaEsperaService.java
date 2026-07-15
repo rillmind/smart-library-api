@@ -44,9 +44,9 @@ public class FilaEsperaService {
         long count = filaEsperaRepository.countByIdLivroAndStatus(livro, "AGUARDANDO");
 
         FilaEspera entrada = FilaEspera.builder()
-                .id_usuario(usuario)
-                .id_livro(livro)
-                .data_entrada(LocalDate.now().toString())
+                .idUsuario(usuario)
+                .idLivro(livro)
+                .dataEntrada(LocalDate.now().toString())
                 .posicao((int) count + 1)
                 .status("AGUARDANDO")
                 .build();
@@ -86,7 +86,7 @@ public class FilaEsperaService {
             filaEsperaRepository.save(proximo);
 
             notificacaoService.criarNotificacao(
-                    proximo.getId_usuario().getCpf(),
+                    proximo.getIdUsuario().getCpf(),
                     "Livro disponível!",
                     "O livro \"" + livro.getTitulo() + "\" está disponível para empréstimo.",
                     "LIVRO_DISPONIVEL"

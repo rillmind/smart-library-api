@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository
 public interface NotificacaoRepository extends JpaRepository<Notificacao, Integer> {
-    List<Notificacao> findByIdUsuarioOrderByDataCriacaoDesc(User id_usuario);
-    long countByIdUsuarioAndLidaFalse(User id_usuario);
+    List<Notificacao> findByIdUsuarioOrderByDataCriacaoDesc(User idUsuario);
+    long countByIdUsuarioAndLidaFalse(User idUsuario);
 }

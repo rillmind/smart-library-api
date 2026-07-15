@@ -5,6 +5,7 @@ import bibliotecaInteligente.api.modules.emprestimo.model.Emprestimo;
 import bibliotecaInteligente.api.modules.user.model.User;
 import jakarta.persistence.*;
 import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,10 +56,40 @@ public class Livro {
     )
     private User posse;
 
-    @OneToMany
-    @JoinColumn(name = "livro_id")
+    @Column
+    private String isbn;
+
+    @Column
+    private String editora;
+
+    @Column
+    private Integer ano;
+
+    @Column
+    private String categoria;
+
+    @Column(name = "total_copies")
+    private Integer totalCopies;
+
+    @Column(name = "library_id")
+    private String libraryId;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "id_livro")
     @Schema(
             description = "Histórico de empréstimos associados ao livro"
     )
     private List<Emprestimo> livros;
+
+    @Transient
+    public Integer getAvailableCopies() {
+        int total = this.totalCopies != null ? this.totalCopies : 1;
+        if (this.livros == null) {
+            return total;
+        }
+        long ativos = this.livros.stream()
+                .filter(e -> "ACTIVE".equals(e.getStatus()) || "ATIVO".equals(e.getStatus()) || "OVERDUE".equals(e.getStatus()) || "ATRASADO".equals(e.getStatus()))
+                .count();
+        return Math.max(0, total - (int) ativos);
+    }
 }

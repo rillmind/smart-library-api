@@ -19,7 +19,7 @@ public class Notificacao {
 
     @ManyToOne
     @JoinColumn(name = "id_usuario")
-    private User id_usuario;
+    private User idUsuario;
 
     @Column
     private String titulo;
@@ -33,6 +33,6 @@ public class Notificacao {
     @Column
     private Boolean lida;
 
-    @Column
-    private String data_criacao;
+    @Column(name = "data_criacao")
+    private String dataCriacao;
 }

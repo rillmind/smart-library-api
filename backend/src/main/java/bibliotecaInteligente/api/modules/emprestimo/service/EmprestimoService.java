@@ -32,8 +32,24 @@ public class EmprestimoService {
         );
         bibliotecaInteligente.api.modules.livro.model.Livro livro = livroService.buscarLivroPorId(emprestimo.getId_livro().getId());
 
+        java.util.List<String> statusAtivos = java.util.Arrays.asList("ACTIVE", "ATIVO", "OVERDUE", "ATRASADO");
+        
+        boolean jaTem = emprestimoRpository.existeEmprestimoAtivo(usuario, livro, statusAtivos);
+        if (jaTem) {
+            throw new RuntimeException("Você já possui um empréstimo ativo deste livro!");
+        }
+
+        long ativos = emprestimoRpository.countEmprestimosAtivosDoLivro(livro, statusAtivos);
+        int total = livro.getTotalCopies() != null ? livro.getTotalCopies() : 1;
+        if (ativos >= total) {
+            throw new RuntimeException("Este livro está esgotado e não está disponível no momento!");
+        }
+
         emprestimo.setId_usuario(usuario);
         emprestimo.setId_livro(livro);
+        if (emprestimo.getStatus() == null) {
+            emprestimo.setStatus("ACTIVE");
+        }
 
         emprestimoRpository.save(emprestimo);
         auditLogService.registrarLog("Empréstimo realizado: Livro " + livro.getTitulo() + " para Usuário " + usuario.getNome(), "Administrador");
