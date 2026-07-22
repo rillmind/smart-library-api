@@ -1,15 +1,55 @@
 version: '3.8'
 
 services:
-  redis-biblioteca:
-    image: redis:7-alpine
+  api-biblioteca:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: biblioteca_api_container
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_URL=jdbc:postgresql://biblioteca-postgres:5432/smartlibrarydb
+      - DB_USER=smartlibrary_user
+      - DB_PASSWORD=smartlibrary_pass
+      - REDIS_HOST=biblioteca-redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=redis_senha_segura
+    restart: always
+    depends_on:
+      biblioteca-postgres:
+        condition: service_healthy
+      biblioteca-redis:
+        condition: service_started
+
+  biblioteca-postgres:
+    image: docker.io/postgres:16-alpine
+    container_name: biblioteca_postgres_container
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: smartlibrarydb
+      POSTGRES_USER: smartlibrary_user
+      POSTGRES_PASSWORD: smartlibrary_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U smartlibrary_user -d smartlibrarydb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: always
+
+  biblioteca-redis:
+    image: docker.io/redis:7-alpine
     container_name: biblioteca_redis_container
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
-    command: redis-server --requirepass ${REDIS_PASSWORD} --appendonly yes
+    command: redis-server --requirepass redis_senha_segura --appendonly yes
     restart: always
 
 volumes:
+  postgres_data:
   redis_data:

@@ -3,6 +3,7 @@ package bibliotecaInteligente.api.modules.livro.model;
 import io.swagger.v3.oas.annotations.media.Schema;
 import bibliotecaInteligente.api.modules.emprestimo.model.Emprestimo;
 import bibliotecaInteligente.api.modules.user.model.User;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -51,9 +52,8 @@ public class Livro {
 
     @ManyToOne
     @JoinColumn(name = "cpf_usuario")
-    @Schema(
-            description = "Usuário proprietário do livro"
-    )
+    @Schema(description = "Usuário proprietário do livro")
+    @JsonIgnoreProperties({"password"})
     private User posse;
 
     @Column

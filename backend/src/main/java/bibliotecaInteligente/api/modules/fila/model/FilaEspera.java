@@ -2,6 +2,7 @@ package bibliotecaInteligente.api.modules.fila.model;
 
 import bibliotecaInteligente.api.modules.livro.model.Livro;
 import bibliotecaInteligente.api.modules.user.model.User;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,6 +21,7 @@ public class FilaEspera {
 
     @ManyToOne
     @JoinColumn(name = "id_usuario")
+    @JsonIgnoreProperties({"password"})
     private User idUsuario;
 
     @ManyToOne

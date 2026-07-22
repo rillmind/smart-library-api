@@ -31,13 +31,13 @@ export class AuthService {
     }
   }
 
-  login(email: string, password: string): Observable<User> {
+  login(login: string, password: string): Observable<User> {
     if (USE_MOCK) {
-      const is_admin = email.includes('admin');
+      const is_admin = login.includes('admin');
       const mockUser: User = {
         id: is_admin ? 'admin' : '1',
         name: is_admin ? 'Administrador Principal' : 'Gustavo de Lima',
-        email: email,
+        email: login,
         phone: '(81) 99999-9999',
         enrollment: is_admin ? 'ADM001' : '2024001',
         type: is_admin ? 'STAFF' : 'STUDENT',
@@ -51,18 +51,16 @@ export class AuthService {
     }
 
     return this.http.post(`${this.apiUrl}/login`, { 
-      email, 
-      password,
-      nome: 'Autenticacao',
-      cpf: '00000000000'
+      login, 
+      password
     }, { responseType: 'text' }).pipe(
       switchMap(() => {
         return this.http.get<any[]>(`${this.apiUrl}/listar`).pipe(
           map(users => {
-            const found = users.find(u => u.email?.toLowerCase() === email.toLowerCase());
+            const found = users.find(u => u.email?.toLowerCase() === login.toLowerCase());
             if (!found) throw new Error("Usuário não encontrado nos registros do sistema.");
             
-            const is_admin = email.includes('admin') || email.includes('raul') || found.nome.toLowerCase().includes('admin');
+            const is_admin = login.includes('admin') || login.includes('raul') || found.nome.toLowerCase().includes('admin');
             const user: User = {
               id: found.cpf,
               name: found.nome,

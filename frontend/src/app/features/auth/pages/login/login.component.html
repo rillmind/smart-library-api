@@ -11,31 +11,50 @@
     <mat-card class="login__card">
       <mat-card-content>
         <h2 class="login__card-title">{{ translationService.translate('login_portal_title') }}</h2>
-        <p class="login__card-subtitle">{{ translationService.translate('login_portal_subtitle') }}</p>
+        <p class="login__card-subtitle">
+          {{ translationService.translate('login_portal_subtitle') }}
+        </p>
 
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login__form">
           <mat-form-field appearance="outline" class="w-full">
-            <mat-label>E-mail</mat-label>
-            <input matInput type="email" formControlName="email" placeholder="Ex: guga@ifpe.edu.br" required />
-            <mat-icon matSuffix>email</mat-icon>
-            @if (loginForm.get('email')?.hasError('email') && loginForm.get('email')?.touched) {
-              <mat-error>E-mail inválido</mat-error>
-            }
-            @if (loginForm.get('email')?.hasError('required') && loginForm.get('email')?.touched) {
-              <mat-error>O e-mail é obrigatório</mat-error>
+            <mat-label>E-mail ou CPF</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="login"
+              placeholder="Digite seu e-mail ou CPF"
+              required
+            />
+            <mat-icon matSuffix>person</mat-icon>
+            @if (loginForm.get('login')?.hasError('required') && loginForm.get('login')?.touched) {
+              <mat-error>O e-mail ou CPF é obrigatório</mat-error>
             }
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="w-full">
             <mat-label>Senha</mat-label>
-            <input matInput type="password" formControlName="password" placeholder="Digite sua senha" required />
+            <input
+              matInput
+              type="password"
+              formControlName="password"
+              placeholder="Digite sua senha"
+              required
+            />
             <mat-icon matSuffix>lock</mat-icon>
-            @if (loginForm.get('password')?.hasError('required') && loginForm.get('password')?.touched) {
+            @if (
+              loginForm.get('password')?.hasError('required') && loginForm.get('password')?.touched
+            ) {
               <mat-error>A senha é obrigatória</mat-error>
             }
           </mat-form-field>
 
-          <button mat-flat-button color="primary" type="submit" class="login__submit-btn" [disabled]="loginForm.invalid || isLoading">
+          <button
+            mat-flat-button
+            color="primary"
+            type="submit"
+            class="login__submit-btn"
+            [disabled]="loginForm.invalid || isLoading"
+          >
             @if (isLoading) {
               Acessando...
             } @else {
@@ -54,7 +73,11 @@
         </div>
 
         <div class="login__quick-access">
-          <button type="button" class="login__role-card login__role-card--admin" (click)="loginQuickAdmin()">
+          <button
+            type="button"
+            class="login__role-card login__role-card--admin"
+            (click)="loginQuickAdmin()"
+          >
             <div class="login__role-icon-wrapper">
               <mat-icon>admin_panel_settings</mat-icon>
             </div>
@@ -65,7 +88,11 @@
             <mat-icon class="login__role-arrow">chevron_right</mat-icon>
           </button>
 
-          <button type="button" class="login__role-card login__role-card--user" (click)="loginQuickUser()">
+          <button
+            type="button"
+            class="login__role-card login__role-card--user"
+            (click)="loginQuickUser()"
+          >
             <div class="login__role-icon-wrapper">
               <mat-icon>account_circle</mat-icon>
             </div>

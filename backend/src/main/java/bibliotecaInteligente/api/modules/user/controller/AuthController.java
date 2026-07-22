@@ -1,5 +1,6 @@
 package bibliotecaInteligente.api.modules.user.controller;
 
+import bibliotecaInteligente.api.modules.user.dto.LoginDto;
 import bibliotecaInteligente.api.modules.user.dto.UserDto;
 import bibliotecaInteligente.api.modules.user.model.User;
 import bibliotecaInteligente.api.modules.user.service.UserService;
@@ -64,10 +65,10 @@ public class AuthController {
             @ApiResponse(responseCode = "401", description = "Credenciais inválidas")
     })
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody @Valid UserDto dto, HttpServletRequest request){
+    public ResponseEntity<String> login(@RequestBody @Valid LoginDto dto, HttpServletRequest request){
         try{
             Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword())
+                    new UsernamePasswordAuthenticationToken(dto.getLogin(), dto.getPassword())
             );
 
             SecurityContext context = SecurityContextHolder.getContext();

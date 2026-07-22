@@ -101,10 +101,10 @@ A integração do frontend com a API real do backend local conta com as seguinte
 - **Docker e Docker Desktop**
 
 ### 1. Inicializar os Serviços de Infraestrutura (Banco e Cache)
-Inicie os contêineres do PostgreSQL e do Redis a partir do diretório raiz:
+Inicie os contêineres do PostgreSQL e do Redis a partir do diretório `backend/`:
 ```bash
 cd backend
-docker compose up -d postgres-db redis-cache
+docker compose up -d biblioteca-postgres biblioteca-redis
 ```
 
 ### 2. Rodar o Backend (API Spring Boot)
@@ -113,7 +113,7 @@ Existem duas formas de executar o backend da aplicação:
 #### Opção A: Rodar como contêiner Docker (Pronto para uso)
 Se desejar executar a API já compilada no contêiner:
 ```bash
-docker compose up -d --build api-service
+docker compose up -d --build api-biblioteca
 ```
 
 #### Opção B: Rodar via terminal com Maven (Ideal para depuração)
@@ -121,9 +121,9 @@ Se desejar executar a API diretamente no console local (com o banco e cache já 
 ```bash
 # No diretório backend/
 # Compilar e empacotar
-./mvnw.cmd package -DskipTests
+./mvnw package -DskipTests
 # Rodar a aplicação
-./mvnw.cmd spring-boot:run
+./mvnw spring-boot:run
 ```
 A API iniciará no endereço `http://localhost:8080`.
 A documentação interativa do Swagger poderá ser acessada em `http://localhost:8080/swagger-ui/index.html`.

@@ -2,6 +2,7 @@ package bibliotecaInteligente.api.modules.emprestimo.model;
 
 import bibliotecaInteligente.api.modules.livro.model.Livro;
 import bibliotecaInteligente.api.modules.user.model.User;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
@@ -24,6 +25,7 @@ public class Emprestimo {
     @ManyToOne
     @JoinColumn(name = "id_usuario")
     @Schema(description = "Usuário que realizou o empréstimo")
+    @JsonIgnoreProperties({"password"})
     private User id_usuario;
 
     @ManyToOne

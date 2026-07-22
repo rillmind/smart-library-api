@@ -1,5 +1,7 @@
 package bibliotecaInteligente.api.modules.user.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -30,6 +32,7 @@ public class User {
     @Column(nullable = false)
     private Boolean bloqueado = false;
     
+    @JsonIgnore
     @Column(nullable = false)
     private String password;
 }

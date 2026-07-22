@@ -34,7 +34,7 @@ export class LoginComponent {
   translationService = inject(TranslationService);
 
   loginForm: FormGroup = this.fb.group({
-    email: ['', [Validators.required, Validators.email]],
+    login: ['', [Validators.required]],
     password: ['', [Validators.required, Validators.minLength(4)]],
   });
 
@@ -44,9 +44,9 @@ export class LoginComponent {
     if (this.loginForm.invalid) return;
 
     this.isLoading = true;
-    const { email, password } = this.loginForm.value;
+    const { login, password } = this.loginForm.value;
 
-    this.authService.login(email, password).subscribe({
+    this.authService.login(login, password).subscribe({
       next: (user) => {
         this.isLoading = false;
         this.snackBar.open('Login realizado com sucesso!', 'Fechar', { duration: 3000 });
@@ -65,14 +65,14 @@ export class LoginComponent {
 
   loginQuickAdmin(): void {
     this.loginForm.setValue({
-      email: 'admin@ifpe.edu.br',
+      login: 'admin@ifpe.edu.br',
       password: 'adminpassword',
     });
   }
 
   loginQuickUser(): void {
     this.loginForm.setValue({
-      email: 'membro@ifpe.edu.br',
+      login: 'membro@ifpe.edu.br',
       password: 'userpassword',
     });
   }

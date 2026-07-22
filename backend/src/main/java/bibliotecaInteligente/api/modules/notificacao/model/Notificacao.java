@@ -1,6 +1,7 @@
 package bibliotecaInteligente.api.modules.notificacao.model;
 
 import bibliotecaInteligente.api.modules.user.model.User;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,6 +20,7 @@ public class Notificacao {
 
     @ManyToOne
     @JoinColumn(name = "id_usuario")
+    @JsonIgnoreProperties({"password"})
     private User idUsuario;
 
     @Column
