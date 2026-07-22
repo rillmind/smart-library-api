@@ -28,24 +28,29 @@ A estrutura do monorepo organiza as pastas de frontend e backend da seguinte for
 
 ```text
 Biblioteca/ (raiz)
+├── docker-compose.yml                         # Orquestração do Postgres, Redis e API
 ├── backend/                                   # API Java / Spring Boot
 │   ├── src/
 │   │   ├── main/
 │   │   │   ├── java/bibliotecaInteligente/api/
 │   │   │   │   ├── config/                    # Configurações de Segurança e OpenAPI
 │   │   │   │   ├── modules/                   # Módulos de domínio da aplicação
-│   │   │   │   │   ├── emprestimo/            # Entidades, regras e rotas de empréstimos
-│   │   │   │   │   ├── livro/                 # Entidades, regras e rotas de livros
-│   │   │   │   │   └── user/                  # Entidades, regras, rotas de usuários e logs
+│   │   │   │   │   ├── user/                  # Cadastro, autenticação, auditoria
+│   │   │   │   │   ├── livro/                 # CRUD de livros
+│   │   │   │   │   ├── emprestimo/            # Empréstimos, renovações, devoluções
+│   │   │   │   │   ├── fila/                  # Fila de espera
+│   │   │   │   │   └── notificacao/           # Notificações in-app
 │   │   │   │   └── ApiApplication.java        # Classe de inicialização do Spring Boot
 │   │   │   └── resources/
 │   │   │       └── application.properties     # Configurações de conexão e variáveis
 │   │   └── test/                              # Testes unitários e de integração
 │   ├── Dockerfile                             # Configuração de build da imagem da API
-│   ├── docker-compose.yml                     # Orquestração do Postgres, Redis e API
 │   └── pom.xml                                # Dependências e dependências Maven
 │
 ├── frontend/                                  # Aplicação Angular 21
+│   ├── Dockerfile                             # Build multi-stage para Docker
+│   ├── nginx.conf                             # Proxy reverso para API
+│   ├── proxy.conf.json                        # Proxy para ng serve local
 │   ├── src/
 │   │   ├── app/
 │   │   │   ├── core/                          # Recursos globais (layouts, services, guards, interceptors)
@@ -100,44 +105,19 @@ A integração do frontend com a API real do backend local conta com as seguinte
 - **Node.js (versão 18 ou superior)**
 - **Docker e Docker Desktop**
 
-### 1. Inicializar os Serviços de Infraestrutura (Banco e Cache)
-Inicie os contêineres do PostgreSQL e do Redis a partir do diretório `backend/`:
+### Rodar Infraestrutura + API (Docker)
 ```bash
-cd backend
-docker compose up -d biblioteca-postgres biblioteca-redis
+docker compose up -d --build
 ```
+A API fica em `http://localhost:8080` e o Swagger em `http://localhost:8080/swagger-ui/index.html`.
 
-### 2. Rodar o Backend (API Spring Boot)
-Existem duas formas de executar o backend da aplicação:
-
-#### Opção A: Rodar como contêiner Docker (Pronto para uso)
-Se desejar executar a API já compilada no contêiner:
+### Rodar o Frontend (local, sem Docker)
 ```bash
-docker compose up -d --build api-biblioteca
-```
-
-#### Opção B: Rodar via terminal com Maven (Ideal para depuração)
-Se desejar executar a API diretamente no console local (com o banco e cache já rodando no Docker):
-```bash
-# No diretório backend/
-# Compilar e empacotar
-./mvnw package -DskipTests
-# Rodar a aplicação
-./mvnw spring-boot:run
-```
-A API iniciará no endereço `http://localhost:8080`.
-A documentação interativa do Swagger poderá ser acessada em `http://localhost:8080/swagger-ui/index.html`.
-
-### 3. Rodar o Frontend (Angular)
-Acesse a pasta do frontend e inicie a interface do usuário:
-```bash
-cd ../frontend
-# Instalar as dependências do projeto
+cd frontend
 npm install
-# Iniciar o servidor de desenvolvimento do Angular
 npm start
 ```
-O frontend ficará disponível em `http://localhost:4200/`.
+O frontend ficará em `http://localhost:4200/` com proxy automático para a API.
 
 ---
 

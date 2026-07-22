@@ -19,8 +19,11 @@ This project uses the Maven wrapper (`mvnw`) with Maven 3.9.15 and Java 21. Ther
 # Build a packaged jar (excludes Lombok from the final jar)
 ./mvnw clean package
 
-# Run infrastructure (PostgreSQL + Redis) and/or the API via Docker
-docker compose up -d
+# Run everything (PostgreSQL, Redis, API, Frontend) via Docker
+docker compose up -d --build
+
+# Or run only infrastructure + API locally
+docker compose up -d biblioteca-postgres biblioteca-redis
 ```
 
 ## Environment
@@ -76,12 +79,12 @@ Typical Spring layered flow: Controller → Service → Repository → JPA → P
 ### Idiomatic inconsistencies to be aware of
 The two modules use **different DI styles** deliberately — follow the precedent of the module you're editing:
 - `user` uses field injection (`@Autowired`) — e.g. `UserController`, `UserService`.
-- `livro` uses constructor injection via Lombok `@RequiredArgsConstructor` on the controller, but `LivroService` is **plain (not annotated `@Service`)** with a hand-written constructor. As a result `LivroService` is currently **not a Spring bean** and the `LivroController` will fail to autowire it at runtime. If you touch the livro module, add `@Service` to `LivroService` (this is an outstanding bug, not intentional).
+- `livro` uses constructor injection via Lombok `@RequiredArgsConstructor` on the controller, and `LivroService` has a hand-written constructor — both work because `@Service` is present.
 
 ### Entity gotchas
-- `User.cpf` is the `@Id`, typed as `Integer` and validated with `@CPF` (Brazilian CPF validator). CPFs are 11 digits and will overflow Int semantics in some cases — the ID type choice is fragile but intentional. Don't switch to `Long`/`String` casually; it would require schema and auth-flow changes.
-- `Livro.id` and `Emprestimo.id` declare `@GeneratedValue(strategy = GenerationType.UUID)` but are typed `Integer`. UUID generation with an `Integer` column is a **runtime mismatch** — expect errors on insert. Treat this as a known issue; do not paper over it without deciding a consistent type strategy.
-- `Livro` has a `@ManyToOne` to `User` (column `cpf_usuario`) and an untyped `@OneToMany` list of `Emprestimo` named `livros` — the field name does not match its contents.
+- `User.cpf` is the `@Id`, typed as `String` and validated with `@CPF` (Brazilian CPF validator). CPFs are 11 digits.
+- `Livro.id` and `Emprestimo.id` use `GenerationType.IDENTITY` — auto-increment integer PKs.
+- `Livro` has a `@ManyToOne` to `User` (column `cpf_usuario`) and a `@OneToMany` list of `Emprestimo` named `livros` — the field name does not match its contents.
 - The `User` entity imports `java.util.UUID` but never uses it.
 
 ### Pattern: partial updates
@@ -91,7 +94,7 @@ Both `UserService.atualizarUserPorCpf` and `LivroService.atualizarLivroPorId` im
 Services throw bare `RuntimeException` for not-found conflicts (`"Usuario não encontrado!"`, `"Id não encontrado!"`). There is no `@ControllerAdvice` / `@ExceptionHandler`. New error responses propagate as 500 by default — consider adding a global exception handler if asked to improve error semantics, but don't do it unprompted.
 
 ### Other
-- `UserDto.cpf` is a `String`, but the `User.cpf` entity field is `Integer`. The `registerUser` service never maps `dto.getCpf()` into the entity — only `email` and `password` are set. Registering a user currently persists null `nome` and `cpf`, violating their `nullable = false` / unique constraints. This is another pre-existing bug; flagging it here so you don't accidentally "refactor" it away while debugging.
+- `UserDto.cpf` is a `String`, and the `User.cpf` entity field is now `String` as well. The `registerUser` service maps `dto.getCpf()` into the entity.
 - `AuthController.logout` is mapped to `@PostMapping("logout")` (missing leading slash — Spring tolerates it, but it's non-standard).
 
 ## Tests
@@ -103,6 +106,6 @@ Only a single default Spring Boot smoke test exists: `ApiApplicationTests.contex
 - `src/main/java/bibliotecaInteligente/api/config/SecurityConfig.java` — security beans: filter chain, `PasswordEncoder`, `AuthenticationManager`.
 - `src/main/java/bibliotecaInteligente/api/modules/user/service/UserService.java` — `UserDetailsService` impl; registration + update/delete by CPF.
 - `src/main/java/bibliotecaInteligente/api/modules/user/controller/AuthController.java` — login / logout endpoints.
-- `src/main/java/bibliotecaInteligente/api/modules/livro/service/LivroService.java` — **missing `@Service` annotation** (see gotchas).
+- `src/main/java/bibliotecaInteligente/api/modules/livro/service/LivroService.java` — book CRUD + deletion with loan/waitlist cleanup.
 - `src/main/resources/application.properties` — all externalized config; Redis section active.
-- `docker-compose.yml` — PostgreSQL + Redis + API services.
+- `docker-compose.yml` (project root) — PostgreSQL + Redis + API services.
